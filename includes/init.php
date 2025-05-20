@@ -40,15 +40,15 @@ $pdo->exec("
 ");
 
 // (Optional) Create sections table if you're moving forward with it soon
-/*
 $pdo->exec("
     CREATE TABLE IF NOT EXISTS sections (
-        id       INTEGER PRIMARY KEY AUTOINCREMENT,
-        unit_id  INTEGER NOT NULL,
-        title    TEXT NOT NULL,
-        body     TEXT NOT NULL,
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        unit_id INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        body TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'draft',
         position INTEGER DEFAULT 0,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (unit_id) REFERENCES units(id) ON DELETE CASCADE
     );
 ");
-*/

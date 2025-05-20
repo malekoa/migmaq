@@ -4,6 +4,8 @@ require_once __DIR__ . '/../controllers/AuthController.php';
 require_once __DIR__ . '/../controllers/DashboardController.php';
 require_once __DIR__ . '/../controllers/UnitController.php';
 require_once __DIR__ . '/../controllers/AudioController.php';
+require_once __DIR__ . '/../controllers/SectionController.php';
+
 
 // Normalize the path
 $uri = rtrim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
@@ -21,6 +23,7 @@ $routes = [
         '/logout' => fn() => (new AuthController($pdo))->logout(),
         '/unit/fetch' => fn() => (new UnitController($pdo))->fetch(),
         '/audio' => fn() => (new AudioController($pdo))->stream(),
+        '/section/fetch' => fn() => (new SectionController($pdo))->fetch(),
     ],
     'POST' => [
         '/login' => fn() => (new AuthController($pdo))->login(),
@@ -29,6 +32,8 @@ $routes = [
         '/unit/delete' => fn() => (new UnitController($pdo))->delete(),
         '/unit/update-order' => fn() => (new UnitController($pdo))->updateOrder(),
         '/audio/upload' => fn() => (new AudioController($pdo))->upload(),
+        '/section/save' => fn() => (new SectionController($pdo))->save(),
+        '/section/delete' => fn() => (new SectionController($pdo))->delete(),
     ]
 ];
 
