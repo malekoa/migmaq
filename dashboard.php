@@ -9,7 +9,19 @@ $dbFile = __DIR__ . '/units.db';
 $pdo = new PDO('sqlite:' . $dbFile);
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-$units = $pdo->query("SELECT * FROM units ORDER BY created_at DESC")->fetchAll(PDO::FETCH_ASSOC);
+$pdo->exec("
+    CREATE TABLE IF NOT EXISTS units (
+        id         INTEGER PRIMARY KEY AUTOINCREMENT,
+        title      TEXT NOT NULL,
+        body       TEXT NOT NULL,
+        status     TEXT NOT NULL DEFAULT 'draft', -- NEW
+        position   INTEGER DEFAULT 0,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+");
+
+$units = $pdo->query("SELECT * FROM units ORDER BY position ASC")->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
 <!DOCTYPE html>
@@ -21,13 +33,14 @@ $units = $pdo->query("SELECT * FROM units ORDER BY created_at DESC")->fetchAll(P
     <script src="/src/suneditor.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 </head>
 
 <body>
     <nav class="bg-body-tertiary navbar navbar-expand-lg">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Learn Mi'gmaq</a>
+            <a class="navbar-brand" href="#">Learn Mi'gmaq <i class="bi-chevron-compact-right bi"></i> Lesson Editor <i class="bi-chevron-compact-right bi"></i> Units</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -71,6 +84,11 @@ $units = $pdo->query("SELECT * FROM units ORDER BY created_at DESC")->fetchAll(P
                         <label for="unitBody" class="form-label">Unit Body:</label>
                         <!-- this textarea will get overwritten with the editor HTML -->
                         <textarea id="sample" name="unitBody" style="width:100%"></textarea>
+                        <label for="unitStatus" class="form-label">Status:</label>
+                        <select class="form-select" name="unitStatus" id="unitStatus">
+                            <option value="draft">Draft</option>
+                            <option value="published">Published</option>
+                        </select>
                     </form>
                 </div>
                 <div class="modal-footer">
@@ -88,8 +106,7 @@ $units = $pdo->query("SELECT * FROM units ORDER BY created_at DESC")->fetchAll(P
 
     <script>
         let lessonEditor;
-        const modal = document.getElementById('exampleModal');
-        modal.addEventListener('shown.bs.modal', () => {
+        window.addEventListener('DOMContentLoaded', () => {
             if (!lessonEditor) {
                 lessonEditor = SUNEDITOR.create('sample', {
                     height: '300px',
@@ -126,36 +143,47 @@ $units = $pdo->query("SELECT * FROM units ORDER BY created_at DESC")->fetchAll(P
             });
     </script>
 
+    <!-- Units -->
     <div class="mt-5 container">
         <h2>All Units</h2>
         <?php if (empty($units)): ?>
             <p>No units added yet.</p>
         <?php else: ?>
-            <?php foreach ($units as $unit): ?>
-                <div class="mb-3 card">
-                    <div class="d-flex align-items-center justify-content-between card-body">
-                        <strong><?= htmlspecialchars($unit['title']) ?></strong>
-                        <div>
-                            <button class="me-2 btn-outline-primary btn btn-sm edit-btn"
-                                data-id="<?= $unit['id'] ?>"
-                                data-title="<?= htmlspecialchars($unit['title'], ENT_QUOTES) ?>"
-                                data-bs-toggle="modal"
-                                data-bs-target="#exampleModal">
-                                <i class="bi bi-pencil"></i> Edit
-                            </button>
-                            <form action="delete_unit.php" method="POST" class="d-inline">
-                                <input type="hidden" name="unitId" value="<?= $unit['id'] ?>">
-                                <button type="submit" class="btn-outline-danger btn btn-sm" onclick="return confirm('Delete this unit?')">
-                                    <i class="bi bi-trash"></i> Delete
+            <div id="unitList" class="list-group">
+                <?php foreach ($units as $unit): ?>
+                    <?php
+                    $statusClass = $unit['status'] === 'published' ? 'success' : 'secondary';
+                    $statusLabel = ucfirst($unit['status']);
+                    ?>
+                    <div class="list-group-item mb-2 p-0 card" data-id="<?= $unit['id'] ?>">
+                        <div class="d-flex align-items-center justify-content-between card-body">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi-grid-3x3-gap-fill text-black-50 bi drag-handle" style="cursor: move;"></i>
+                                <strong><?= htmlspecialchars($unit['title']) ?></strong>
+                                <span class="badge bg-<?= $statusClass ?>"><?= $statusLabel ?></span>
+                            </div>
+                            <div>
+                                <button class="me-2 btn-outline-primary btn btn-sm edit-btn"
+                                    data-id="<?= $unit['id'] ?>"
+                                    data-title="<?= htmlspecialchars($unit['title'], ENT_QUOTES) ?>"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#exampleModal">
+                                    <i class="bi bi-pen"></i> Edit
                                 </button>
-                            </form>
+                                <form action="delete_unit.php" method="POST" class="d-inline">
+                                    <input type="hidden" name="unitId" value="<?= $unit['id'] ?>">
+                                    <button type="submit" class="btn-outline-danger btn btn-sm" onclick="return confirm('Delete this unit?')">
+                                        <i class="bi bi-trash3"></i> Delete
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                </div>
-            <?php endforeach; ?>
+                <?php endforeach; ?>
+            </div>
         <?php endif; ?>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-            New Unit
+            <i class="bi bi-plus-lg"></i> New Unit
         </button>
     </div>
 
@@ -201,9 +229,34 @@ $units = $pdo->query("SELECT * FROM units ORDER BY created_at DESC")->fetchAll(P
                 if (lessonEditor) {
                     lessonEditor.setContents(data.body || '');
                 }
+                document.getElementById('unitStatus').value = data.status || 'draft';
             });
         });
     </script>
+
+    <script>
+        new Sortable(document.getElementById('unitList'), {
+            handle: '.drag-handle',
+            animation: 150,
+            onEnd: function() {
+                const order = [...document.querySelectorAll('#unitList .list-group-item')].map((el, idx) => ({
+                    id: el.dataset.id,
+                    position: idx
+                }));
+
+                fetch('update_unit_order.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(order)
+                }).then(res => {
+                    if (!res.ok) console.error('Failed to update unit order');
+                });
+            }
+        });
+    </script>
+
 
 </body>
 

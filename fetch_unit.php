@@ -14,7 +14,7 @@ $dbFile = __DIR__ . '/units.db';
 $pdo = new PDO('sqlite:' . $dbFile);
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-$stmt = $pdo->prepare("SELECT body FROM units WHERE id = ?");
+$stmt = $pdo->prepare("SELECT body, status FROM units WHERE id = ?");
 $stmt->execute([$_GET['id']]);
 $unit = $stmt->fetch(PDO::FETCH_ASSOC);
 

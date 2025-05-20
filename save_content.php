@@ -16,12 +16,14 @@ try {
 
     // 2) ensure the table exists
     $pdo->exec("
-        CREATE TABLE IF NOT EXISTS units (
-            id          INTEGER PRIMARY KEY AUTOINCREMENT,
-            title       TEXT    NOT NULL,
-            body        TEXT    NOT NULL,
-            created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
+    CREATE TABLE IF NOT EXISTS units (
+        id         INTEGER PRIMARY KEY AUTOINCREMENT,
+        title      TEXT NOT NULL,
+        body       TEXT NOT NULL,
+        status     TEXT NOT NULL DEFAULT 'draft', -- NEW
+        position   INTEGER DEFAULT 0,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
     ");
 
     // 3) only handle POST
@@ -30,6 +32,7 @@ try {
         $title = trim($_POST['unitTitle'] ?? '');
         $body  = $_POST['unitBody'] ?? '';
         $unitId = $_POST['unitId'] ?? null;
+        $status = $_POST['unitStatus'] ?? 'draft';
 
         if ($title === '') {
             throw new Exception('Unit title cannot be empty');
@@ -37,23 +40,24 @@ try {
 
         // 4) insert or update
         if ($unitId) {
-            // Update existing unit
+            // UPDATE
             $stmt = $pdo->prepare('
-                UPDATE units
-                SET title = :title, body = :body
-                WHERE id = :id
-            ');
+        UPDATE units
+        SET title = :title, body = :body, status = :status
+        WHERE id = :id
+    ');
             $stmt->bindValue(':id', $unitId, PDO::PARAM_INT);
         } else {
-            // Insert new unit
+            // INSERT
             $stmt = $pdo->prepare('
-                INSERT INTO units (title, body)
-                VALUES (:title, :body)
-            ');
+        INSERT INTO units (title, body, status)
+        VALUES (:title, :body, :status)
+    ');
         }
 
         $stmt->bindValue(':title', $title, PDO::PARAM_STR);
         $stmt->bindValue(':body',  $body,  PDO::PARAM_STR);
+        $stmt->bindValue(':status', $status, PDO::PARAM_STR);
         $stmt->execute();
 
         // 5) redirect on success
