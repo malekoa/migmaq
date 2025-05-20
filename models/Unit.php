@@ -1,0 +1,83 @@
+<?php
+// models/Unit.php
+
+class Unit
+{
+    private PDO $pdo;
+
+    public function __construct(PDO $pdo)
+    {
+        $this->pdo = $pdo;
+    }
+
+    public function all(): array
+    {
+        $stmt = $this->pdo->query("SELECT * FROM units ORDER BY position ASC");
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function find(int $id): ?array
+    {
+        $stmt = $this->pdo->prepare("SELECT * FROM units WHERE id = ?");
+        $stmt->execute([$id]);
+        $unit = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $unit ?: null;
+    }
+
+    public function updatePosition(int $id, int $position): void
+    {
+        $stmt = $this->pdo->prepare("UPDATE units SET position = :position WHERE id = :id");
+        $stmt->execute([
+            ':id' => $id,
+            ':position' => $position,
+        ]);
+    }
+
+
+    public function save(array $data): void
+    {
+        if (!empty($data['id'])) {
+            // Update
+            $stmt = $this->pdo->prepare("
+                UPDATE units
+                SET title = :title, body = :body, status = :status
+                WHERE id = :id
+            ");
+            $stmt->execute([
+                ':title' => $data['title'],
+                ':body' => $data['body'],
+                ':status' => $data['status'],
+                ':id' => $data['id']
+            ]);
+        } else {
+            // Insert
+            $stmt = $this->pdo->prepare("
+                INSERT INTO units (title, body, status)
+                VALUES (:title, :body, :status)
+            ");
+            $stmt->execute([
+                ':title' => $data['title'],
+                ':body' => $data['body'],
+                ':status' => $data['status']
+            ]);
+        }
+    }
+
+    public function delete(int $id): bool
+    {
+        $stmt = $this->pdo->prepare("DELETE FROM units WHERE id = ?");
+        return $stmt->execute([$id]);
+    }
+
+    public function updatePositions(array $positions): void
+    {
+        $stmt = $this->pdo->prepare("UPDATE units SET position = :position WHERE id = :id");
+
+        foreach ($positions as $pos) {
+            $stmt->execute([
+                ':id' => $pos['id'],
+                ':position' => $pos['position']
+            ]);
+        }
+    }
+}

@@ -1,28 +1,6 @@
-<?php
-session_start();
-if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
-    exit();
-}
-// Load units from DB
-$dbFile = __DIR__ . '/units.db';
-$pdo = new PDO('sqlite:' . $dbFile);
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-$pdo->exec("
-    CREATE TABLE IF NOT EXISTS units (
-        id         INTEGER PRIMARY KEY AUTOINCREMENT,
-        title      TEXT NOT NULL,
-        body       TEXT NOT NULL,
-        status     TEXT NOT NULL DEFAULT 'draft', -- NEW
-        position   INTEGER DEFAULT 0,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    );
-");
-
-$units = $pdo->query("SELECT * FROM units ORDER BY position ASC")->fetchAll(PDO::FETCH_ASSOC);
-
-?>
+<?php if (!isset($units)) {
+    $units = [];
+} ?>
 
 <!DOCTYPE html>
 <html>
@@ -50,7 +28,7 @@ $units = $pdo->query("SELECT * FROM units ORDER BY position ASC")->fetchAll(PDO:
                 <div class="d-flex">
                     <span class="navbar-text">Signed in as: <strong><?= htmlspecialchars($_SESSION['username']) ?></strong></span>
                     <span class="me-3"></span>
-                    <a class="btn-success btn" href="logout.php">Log Out</a>
+                    <a class="btn-success btn" href="/logout">Log Out</a>
                 </div>
             </div>
         </div>
@@ -77,7 +55,7 @@ $units = $pdo->query("SELECT * FROM units ORDER BY position ASC")->fetchAll(PDO:
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="save_content.php" method="POST" id="saveForm">
+                    <form action="/unit/save" method="POST" id="saveForm">
                         <label for="unitTitle" class="form-label">Unit Title:</label>
                         <input type="text" name="unitTitle" id="unitTitle" class="form-control"><br>
                         <input type="hidden" name="unitId" id="unitId">
@@ -121,7 +99,7 @@ $units = $pdo->query("SELECT * FROM units ORDER BY position ASC")->fetchAll(PDO:
                     // === audio upload config ===
                     audioFileInput: true, // show a file-picker in the audio dialog
                     audioUrlInput: false, // hide the URL‐input field
-                    audioUploadUrl: 'upload_audio_sqlite.php', // endpoint that handles the upload
+                    audioUploadUrl: '/audio/upload', // endpoint that handles the upload
                     audioUploadHeader: {}, // any custom headers, if needed
                     // audioMultipleFile: false,      // default = false
                     // audioUploadSizeLimit: 10485760, // e.g. 10MB limit
@@ -170,7 +148,7 @@ $units = $pdo->query("SELECT * FROM units ORDER BY position ASC")->fetchAll(PDO:
                                     data-bs-target="#exampleModal">
                                     <i class="bi bi-pen"></i> Edit
                                 </button>
-                                <form action="delete_unit.php" method="POST" class="d-inline">
+                                <form action="/unit/delete" method="POST" class="d-inline">
                                     <input type="hidden" name="unitId" value="<?= $unit['id'] ?>">
                                     <button type="submit" class="btn-outline-danger btn btn-sm" onclick="return confirm('Delete this unit?')">
                                         <i class="bi bi-trash3"></i> Delete
@@ -202,6 +180,10 @@ $units = $pdo->query("SELECT * FROM units ORDER BY position ASC")->fetchAll(PDO:
                     toastBody.textContent = 'Unit saved successfully!';
                     toastEl.classList.remove('bg-danger', 'text-white');
                     toastEl.classList.add('bg-white', 'text-dark');
+                <?php elseif ($_GET['status'] === 'deleted'): ?>
+                    toastBody.textContent = 'Unit deleted successfully!';
+                    toastEl.classList.remove('bg-danger', 'text-white');
+                    toastEl.classList.add('bg-white', 'text-dark');
                 <?php else: ?>
                     toastBody.textContent = <?= json_encode('Error: ' . ($_GET['msg'] ?? 'Unknown error')) ?>;
                     toastEl.classList.remove('bg-white', 'text-dark');
@@ -224,7 +206,7 @@ $units = $pdo->query("SELECT * FROM units ORDER BY position ASC")->fetchAll(PDO:
                 document.getElementById('unitTitle').value = unitTitle;
 
                 // Fetch body content via AJAX
-                const res = await fetch(`fetch_unit.php?id=${unitId}`);
+                const res = await fetch(`/unit/fetch?id=${unitId}`);
                 const data = await res.json();
                 if (lessonEditor) {
                     lessonEditor.setContents(data.body || '');
@@ -244,7 +226,7 @@ $units = $pdo->query("SELECT * FROM units ORDER BY position ASC")->fetchAll(PDO:
                     position: idx
                 }));
 
-                fetch('update_unit_order.php', {
+                fetch('/unit/update-order', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
