@@ -68,19 +68,23 @@ class DashboardController
             exit('Missing unitId or sectionId');
         }
 
+        $unitModel = new Unit($this->pdo); // <-- ADD THIS
         $sectionModel = new Section($this->pdo);
         $lessonModel = new Lesson($this->pdo);
 
+        $unit = $unitModel->find($unitId); // <-- ADD THIS
         $section = $sectionModel->find($sectionId);
-        if (!$section || $section['unit_id'] != $unitId) {
+
+        if (!$unit || !$section || $section['unit_id'] != $unit['id']) {
             http_response_code(404);
-            exit('Section not found or mismatched unit');
+            exit('Not found or mismatched hierarchy');
         }
 
         $lessons = $lessonModel->getBySection($sectionId);
 
         require __DIR__ . '/../views/lesson_editor.php';
     }
+
 
 
     private function ensureAuthenticated()

@@ -1,35 +1,50 @@
 <?php
-// Determine the current page
 $currentPath = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$breadcrumbTitle = 'Dashboard';
-
-if (str_starts_with($currentPath, '/dashboard/unit-editor')) {
-    $breadcrumbTitle = 'Unit Editor';
-} elseif (str_starts_with($currentPath, '/dashboard/section-editor')) {
-    $breadcrumbTitle = 'Section Editor';
-} elseif (str_starts_with($currentPath, '/dashboard/lesson-editor')) {
-    $breadcrumbTitle = 'Lesson Editor';
-}
 ?>
 
-<nav class="bg-body-tertiary navbar navbar-expand-lg">
+<nav class="bg-body-tertiary border-bottom navbar navbar-expand-lg">
     <div class="d-flex align-items-center justify-content-between container-fluid">
-        <nav aria-label="breadcrumb" class="mb-0">
-            <ol class="mb-0 breadcrumb">
-                <li class="breadcrumb-item"><a href="/dashboard/unit-editor">Dashboard</a></li>
-                <li class="breadcrumb-item active" aria-current="page"><?= htmlspecialchars($breadcrumbTitle) ?></li>
-            </ol>
-        </nav>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="me-auto mb-2 mb-lg-0 navbar-nav"></ul>
-            <div class="d-flex align-items-center">
-                <span class="navbar-text">Signed in as: <strong><?= htmlspecialchars($_SESSION['username']) ?></strong></span>
-                <span class="me-3"></span>
-                <a class="btn-success btn" href="/logout">Log Out</a>
+
+        <!-- Left: Back to Units + hierarchy -->
+        <div class="d-flex align-items-center gap-3 py-2">
+            <a href="/dashboard/unit-editor" class="btn-outline-secondary btn btn-sm">
+                ← Back to Units
+            </a>
+
+            <!-- Contextual Hierarchy -->
+            <div>
+                <?php if (str_starts_with($currentPath, '/dashboard/unit-editor')): ?>
+                    <strong>Viewing all Units</strong>
+                <?php elseif (str_starts_with($currentPath, '/dashboard/section-editor') && isset($unit)): ?>
+                    <span class="text-muted">Unit:</span>
+                    <a href="/dashboard/section-editor?unitId=<?= $unit['id'] ?>">
+                        <?= htmlspecialchars($unit['title']) ?>
+                    </a>
+                    <span class="mx-2">→</span>
+                    <strong>Sections</strong>
+                <?php elseif (str_starts_with($currentPath, '/dashboard/lesson-editor') && isset($unit, $section)): ?>
+                    <span class="text-muted">Unit:</span>
+                    <a href="/dashboard/section-editor?unitId=<?= $unit['id'] ?>">
+                        <?= htmlspecialchars($unit['title']) ?>
+                    </a>
+                    <span class="mx-2">→</span>
+                    <span class="text-muted">Section:</span>
+                    <a href="/dashboard/lesson-editor?unitId=<?= $unit['id'] ?>&sectionId=<?= $section['id'] ?>">
+                        <?= htmlspecialchars($section['title']) ?>
+                    </a>
+                    <span class="mx-2">→</span>
+                    <strong>Lessons</strong>
+                <?php else: ?>
+                    <strong>Dashboard</strong>
+                <?php endif; ?>
             </div>
+        </div>
+
+        <!-- Right: User info and logout -->
+        <div class="d-flex align-items-center">
+            <span class="navbar-text">Signed in as: <strong><?= htmlspecialchars($_SESSION['username']) ?></strong></span>
+            <span class="me-3"></span>
+            <a class="btn-success btn" href="/logout">Log Out</a>
         </div>
     </div>
 </nav>
