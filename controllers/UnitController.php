@@ -62,7 +62,8 @@ class UnitController
 
         $this->unitModel->delete($unitId);
 
-        header('Location: /dashboard?status=deleted');
+        // header('Location: /dashboard?status=deleted');
+        header('Location: /dashboard/unit-editor?status=deleted');
         exit;
     }
 
@@ -89,7 +90,7 @@ class UnitController
         ]);
 
         // ✅ redirect before any output
-        header('Location: /dashboard?status=success');
+        header('Location: /dashboard/unit-editor?status=success');
         exit;
     }
 

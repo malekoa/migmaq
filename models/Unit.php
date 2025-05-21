@@ -24,6 +24,15 @@ class Unit
         return $unit ?: null;
     }
 
+    public static function findByTitle($title)
+    {
+        global $pdo;
+        $stmt = $pdo->prepare("SELECT * FROM units WHERE title = ?");
+        $stmt->execute([$title]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+
     public function updatePosition(int $id, int $position): void
     {
         $stmt = $this->pdo->prepare("UPDATE units SET position = :position WHERE id = :id");

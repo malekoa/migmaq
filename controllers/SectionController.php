@@ -42,21 +42,27 @@ class SectionController
         }
 
         $this->sectionModel->save($data);
-        header('Location: /dashboard?status=section_saved');
+        // header('Location: /dashboard?status=section_saved');
+        $unitId = $data['unit_id'];
+        header("Location: /dashboard/section-editor?unitId=$unitId&status=section_saved");
         exit;
     }
 
     public function delete(): void
     {
         $id = $_POST['sectionId'] ?? null;
-        if ($id) {
+        $unitId = $_POST['unitId'] ?? null;
+
+        if ($id && $unitId) {
             $this->sectionModel->delete($id);
-            header('Location: /dashboard?status=section_deleted');
+            header("Location: /dashboard/section-editor?unitId=$unitId&status=section_deleted");
+            exit;
         } else {
             http_response_code(400);
-            exit('Missing section ID');
+            exit('Missing section ID or unit ID');
         }
     }
+
 
     public function fetch(): void
     {
@@ -75,5 +81,28 @@ class SectionController
         }
 
         echo json_encode($section);
+    }
+
+    public function updateOrder(): void
+    {
+        if (!isset($_SESSION['user_id'])) {
+            http_response_code(403);
+            exit('Unauthorized');
+        }
+
+        $data = json_decode(file_get_contents('php://input'), true);
+        if (!is_array($data)) {
+            http_response_code(400);
+            exit('Invalid input');
+        }
+
+        foreach ($data as $item) {
+            if (!isset($item['id'], $item['position'])) {
+                continue;
+            }
+            // Assuming you add a method "updatePosition" in your Section model:
+            $this->sectionModel->updatePosition($item['id'], $item['position']);
+        }
+        echo json_encode(['status' => 'success']);
     }
 }

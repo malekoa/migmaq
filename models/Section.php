@@ -56,4 +56,13 @@ class Section
         $section = $stmt->fetch(PDO::FETCH_ASSOC);
         return $section ?: null;
     }
+
+    public function updatePosition(int $id, int $position): void
+    {
+        $stmt = $this->pdo->prepare("UPDATE sections SET position = :position WHERE id = :id");
+        $stmt->execute([
+            ':position' => $position,
+            ':id' => $id,
+        ]);
+    }
 }
