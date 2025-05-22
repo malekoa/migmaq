@@ -10,6 +10,9 @@ require_once __DIR__ . '/../controllers/AudioController.php';
 require_once __DIR__ . '/../controllers/SectionController.php';
 require_once __DIR__ . '/../controllers/LessonController.php';
 
+require_once __DIR__ . '/../controllers/ContentsController.php';
+require_once __DIR__ . '/../controllers/PageController.php';
+
 
 
 // Normalize the path
@@ -20,7 +23,8 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 $routes = [
     'GET' => [
-        '/' => fn() => (new DashboardController($pdo))->index(),
+        '/' => fn() => (new PageController($pdo))->landing(),
+        '/contents' => fn() => (new ContentsController($pdo))->show(),
         '/dashboard' => fn() => (new DashboardController($pdo))->index(),
         '/login' => fn() => (new AuthController($pdo))->showLogin(),
         '/register' => fn() => (new AuthController($pdo))->showRegister(),
@@ -33,6 +37,9 @@ $routes = [
         '/dashboard/section-editor' => fn() => (new DashboardController($pdo))->sectionEditor(),
         '/dashboard/lesson-editor' => fn() => (new DashboardController($pdo))->lessonEditor(),
         '/lesson/fetch' => fn() => (new LessonController($pdo))->fetch(),
+        '/unit' => fn() => (new PageController($pdo))->showUnit(),
+        '/section' => fn() => (new PageController($pdo))->showSection(),
+        '/lesson' => fn() => (new PageController($pdo))->showLesson(),
     ],
     'POST' => [
         '/login' => fn() => (new AuthController($pdo))->login(),

@@ -1,29 +1,60 @@
+<?php $title = 'Login'; ?>
 <!DOCTYPE html>
-<html>
-<head>
-    <title>Login</title>
-</head>
-<body>
-    <h1>Login</h1>
+<html lang="en">
+<?php include __DIR__ . '/partials/head.php'; ?>
+<body class="d-flex align-items-center justify-content-center bg-light min-vh-100">
 
-    <?php if (!empty($errors)): ?>
-        <ul style="color:red;">
-            <?php foreach ($errors as $error): ?>
-                <li><?= htmlspecialchars($error) ?></li>
-            <?php endforeach; ?>
-        </ul>
-    <?php endif; ?>
+<div class="container">
+    <div class="justify-content-center row">
+        <div class="col-md-6 col-lg-5">
+            <div class="shadow-sm p-4 card">
+                <h1 class="mb-4 text-center">Sign In</h1>
 
-    <form action="/login" method="POST">
-        <label>Email:<br>
-            <input type="email" name="email" required value="<?= htmlspecialchars($_POST['email'] ?? '') ?>">
-        </label><br><br>
-        <label>Password:<br>
-            <input type="password" name="password" required>
-        </label><br><br>
-        <button type="submit">Login</button>
-    </form>
+                <?php if (!empty($errors)): ?>
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            <?php foreach ($errors as $error): ?>
+                                <li><?= htmlspecialchars($error) ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
 
-    <p>Don't have an account? <a href="/register">Register here</a>.</p>
+                <form action="/login" method="POST">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input
+                            type="email"
+                            class="form-control"
+                            id="email"
+                            name="email"
+                            required
+                            value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
+                        >
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input
+                            type="password"
+                            class="form-control"
+                            id="password"
+                            name="password"
+                            required
+                        >
+                    </div>
+
+                    <button type="submit" class="w-100 btn btn-primary">Log In</button>
+                </form>
+
+                <p class="mt-3 text-center small">
+                    Don't have an account?
+                    <a href="/register">Register here</a>.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

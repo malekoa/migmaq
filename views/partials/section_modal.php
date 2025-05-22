@@ -1,4 +1,5 @@
-<?php // views/partials/section_modal.php ?>
+<?php // views/partials/section_modal.php 
+?>
 <div class="modal modal-xl fade" id="sectionModal" tabindex="-1" aria-labelledby="sectionModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -60,4 +61,44 @@
         .addEventListener('submit', e => {
             document.getElementById('sectionEditor').value = sectionEditor.getContents(false);
         });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Fill form fields when clicking an edit button
+        document.querySelectorAll('.edit-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                const id = button.dataset.id;
+                const title = button.dataset.title;
+                const body = button.dataset.body;
+                const status = button.dataset.status;
+
+                document.getElementById('sectionId').value = id;
+                document.getElementById('sectionTitle').value = title;
+                document.getElementById('sectionStatus').value = status;
+
+                // Set editor content
+                if (sectionEditor) {
+                    sectionEditor.setContents(body || '');
+                }
+
+                // Update modal title
+                document.getElementById('sectionModalLabel').textContent = 'Edit Section';
+            });
+        });
+
+        // Reset form when opening for new section
+        const sectionModal = document.getElementById('sectionModal');
+        sectionModal.addEventListener('show.bs.modal', event => {
+            const trigger = event.relatedTarget;
+            if (!trigger.classList.contains('edit-btn')) {
+                document.getElementById('sectionSaveForm').reset();
+                document.getElementById('sectionId').value = '';
+                document.getElementById('sectionModalLabel').textContent = 'Create Section';
+                if (sectionEditor) {
+                    sectionEditor.setContents('');
+                }
+            }
+        });
+    });
 </script>

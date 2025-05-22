@@ -3,6 +3,7 @@
 <html>
 <!-- HTML Head -->
 <?php require __DIR__ . '/partials/head.php'; ?>
+
 <body>
     <!-- Dashboard Navbar -->
     <?php require __DIR__ . '/partials/dashboard_navbar.php'; ?>
@@ -35,12 +36,15 @@
                                     <i class="bi bi-journals"></i> Open Lessons
                                 </a>
                                 <button class="btn-outline-primary btn btn-sm edit-btn"
-                                        data-id="<?= htmlspecialchars($section['id']) ?>"
-                                        data-title="<?= htmlspecialchars($section['title'], ENT_QUOTES) ?>"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#sectionModal">
+                                    data-id="<?= htmlspecialchars($section['id']) ?>"
+                                    data-title="<?= htmlspecialchars($section['title'], ENT_QUOTES) ?>"
+                                    data-body="<?= htmlspecialchars($section['body'], ENT_QUOTES) ?>"
+                                    data-status="<?= htmlspecialchars($section['status']) ?>"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#sectionModal">
                                     <i class="bi bi-pencil-square"></i> Edit Section
                                 </button>
+
                                 <form action="/section/delete" method="POST" class="d-inline">
                                     <input type="hidden" name="sectionId" value="<?= htmlspecialchars($section['id']) ?>">
                                     <input type="hidden" name="unitId" value="<?= htmlspecialchars($unit['id']) ?>">
@@ -62,9 +66,9 @@
     <!-- Initialize SortableJS for sections -->
     <script>
         new Sortable(document.getElementById('sectionList'), {
-            handle: '.drag-handle',  // allow drag only on this element
+            handle: '.drag-handle', // allow drag only on this element
             animation: 150,
-            onEnd: function () {
+            onEnd: function() {
                 // Collect the new order from the DOM
                 const order = [...document.querySelectorAll('#sectionList .list-group-item')].map((el, idx) => ({
                     id: el.dataset.id,
@@ -73,7 +77,9 @@
                 // Send the updated order to the backend
                 fetch('/section/update-order', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
                     body: JSON.stringify(order)
                 }).then(res => {
                     if (!res.ok) console.error('Failed to update section order');
@@ -82,4 +88,5 @@
         });
     </script>
 </body>
+
 </html>
