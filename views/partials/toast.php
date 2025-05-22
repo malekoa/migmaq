@@ -35,6 +35,14 @@
                 toastBody.textContent = 'Section saved successfully!';
                 toastEl.classList.remove('bg-danger', 'text-white');
                 toastEl.classList.add('bg-white', 'text-dark');
+            <?php elseif ($_GET['status'] === 'lesson_saved'): ?>
+                toastBody.textContent = 'Lesson saved successfully!';
+                toastEl.classList.remove('bg-danger', 'text-white');
+                toastEl.classList.add('bg-white', 'text-dark');
+            <?php elseif ($_GET['status'] === 'lesson_deleted'): ?>
+                toastBody.textContent = 'Lesson deleted successfully!';
+                toastEl.classList.remove('bg-danger', 'text-white');
+                toastEl.classList.add('bg-white', 'text-dark');
             <?php else: ?>
                 toastBody.textContent = <?= json_encode('Error: ' . ($_GET['msg'] ?? 'Unknown error')) ?>;
                 toastEl.classList.remove('bg-white', 'text-dark');

@@ -32,6 +32,7 @@ class AuthController
                 if ($user && password_verify($password, $user['password'])) {
                     $_SESSION['user_id'] = $user['id'];
                     $_SESSION['username'] = $user['username'];
+                    $_SESSION['role'] = $user['role'];
                     header("Location: /dashboard");
                     exit();
                 } else {
@@ -76,8 +77,13 @@ class AuthController
         if (empty($errors)) {
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             try {
-                $stmt = $this->pdo->prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)");
-                $stmt->execute([$username, $email, $hashedPassword]);
+                $stmt = $this->pdo->query("SELECT COUNT(*) FROM users");
+                $userCount = $stmt->fetchColumn();
+                $role = $userCount == 0 ? 'admin' : 'contributor';
+
+                $stmt = $this->pdo->prepare("INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)");
+                $stmt->execute([$username, $email, $hashedPassword, $role]);
+
                 header("Location: /register?success=1");
                 exit();
             } catch (PDOException $e) {
