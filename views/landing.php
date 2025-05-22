@@ -2,7 +2,7 @@
 <html>
 <?php require __DIR__ . '/partials/head.php'; ?>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
 
     <header>
         <nav class="px-2 py-0 navbar" style="background-color: rgb(240, 69, 21);">
@@ -31,18 +31,18 @@
 
 
 
-    <main>
+    <main class="flex-grow-1">
         <div class="hero-image" style="
         background-image: url('/assets/landscape.png');
         background-size: cover;
         background-position: center 50%;
-        height: 300px;">
+        height: 250px;">
         </div>
 
         <div class="mt-5 container">
             <div class="align-items-center row">
                 <!-- Text Content -->
-                <div class="mb-4 mb-md-0 text-md-start text-center col-md-6">
+                <div class="mb-4 mb-md-0 text-md-start text-center col-md-8">
                     <h1>Learn Mi'gmaq Online</h1>
                     <p class="lead">This site helps you learn Mi'gmaq on your own or alongside classes.</p>
                     <p>Each section includes units with vocabulary, dialogs, and practice exercises. You'll hear real Mi'gmaq speakers to train your ear and pronunciation.</p>
@@ -54,7 +54,7 @@
                 </div>
 
                 <!-- Logos -->
-                <div class="text-center col-md-6">
+                <div class="text-center col-md-4">
                     <div class="d-flex flex-column align-items-center gap-4">
                         <img src="/assets/listuguj-logo.png" alt="Listuguj Education Directorate" style="width: 200px; object-fit: contain;">
                         <img src="/assets/mcgill-logo.png" alt="McGill University" style="width: 200px; object-fit: contain;">
@@ -65,32 +65,8 @@
         </div>
     </main>
 
-    <footer class="mt-5 pt-4 pb-3 border-top text-bg-light">
-        <div class="container">
-            <div class="align-items-center justify-content-between row">
-                <!-- Left side: Standard footer links -->
-                <div class="mb-3 mb-md-0 col-md-6">
-                    <ul class="list-inline mb-0">
-                        <li class="list-inline-item"><a href="/about" class="text-muted text-decoration-none">About</a></li>
-                        <li class="list-inline-item"><a href="/privacy" class="text-muted text-decoration-none">Privacy Policy</a></li>
-                        <li class="list-inline-item"><a href="/contact" class="text-muted text-decoration-none">Contact</a></li>
-                    </ul>
-                </div>
+    <?php require __DIR__ . '/partials/footer.php'; ?>
 
-                <!-- Right side: Admin/editor link -->
-                <div class="text-md-end col-md-6">
-                    <a href="/dashboard/unit-editor" class="text-muted text-decoration-none">
-                        Editor Dashboard
-                    </a>
-                </div>
-            </div>
-
-            <!-- Bottom line -->
-            <div class="mt-3 text-muted text-center small">
-                &copy; <?= date('Y') ?> Learn Mi'gmaq Online. All rights reserved.
-            </div>
-        </div>
-    </footer>
 
 </body>
 
