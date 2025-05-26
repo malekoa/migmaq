@@ -57,7 +57,7 @@
                 <div class="text-center col-md-4">
                     <div class="d-flex flex-column align-items-center gap-4">
                         <img src="/assets/listuguj-logo.png" alt="Listuguj Education Directorate" style="width: 200px; object-fit: contain;">
-                        <img src="/assets/mcgill-logo.png" alt="McGill University" style="width: 200px; object-fit: contain;">
+                        <img src="/assets/mcgill-logo.png" alt="McGill University" style="width: 190px; object-fit: contain;">
                         <img src="/assets/concordia-logo.png" alt="Concordia University" style="width: 200px; object-fit: contain;">
                     </div>
                 </div>
