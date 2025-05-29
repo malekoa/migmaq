@@ -66,3 +66,15 @@ $pdo->exec("
         FOREIGN KEY (section_id) REFERENCES sections(id) ON DELETE CASCADE
     );
 ");
+
+$pdo->exec("
+    CREATE TABLE IF NOT EXISTS settings (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL
+    );
+");
+
+// Ensure default value is set
+$pdo->exec("
+    INSERT OR IGNORE INTO settings (key, value) VALUES ('registration_enabled', '1');
+");

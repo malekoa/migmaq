@@ -5,6 +5,7 @@
 <body>
     <?php require __DIR__ . '/partials/dashboard_navbar.php'; ?>
 
+
     <div class="mt-5 container">
         <h2>Manage Users</h2>
         <table class="table align-middle">
@@ -20,41 +21,41 @@
             <tbody>
                 <?php foreach ($users as $user): ?>
                     <tr>
-                        <form action="/user/update" method="POST">
-                            <td><?= htmlspecialchars($user['id']) ?></td>
-                            <td>
-                                <input type="text" name="username" value="<?= htmlspecialchars($user['username']) ?>" class="form-control form-control-sm" required>
-                            </td>
-                            <td>
-                                <input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" class="form-control form-control-sm" required>
-                            </td>
-                            <td>
-                                <select name="role" class="form-select-sm form-select">
-                                    <option value="contributor" <?= $user['role'] === 'contributor' ? 'selected' : '' ?>>Contributor</option>
-                                    <option value="admin" <?= $user['role'] === 'admin' ? 'selected' : '' ?>>Admin</option>
-                                </select>
-                            </td>
-                            <td>
+                        <td><?= htmlspecialchars($user['id']) ?></td>
+                        <td>
+                            <form action="/user/update" method="POST" class="d-inline">
                                 <input type="hidden" name="userId" value="<?= $user['id'] ?>">
+                                <input type="text" name="username" value="<?= htmlspecialchars($user['username']) ?>" class="form-control form-control-sm" required>
+                        </td>
+                        <td>
+                            <input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" class="form-control form-control-sm" required>
+                        </td>
+                        <td>
+                            <select name="role" class="form-select-sm form-select">
+                                <option value="contributor" <?= $user['role'] === 'contributor' ? 'selected' : '' ?>>Contributor</option>
+                                <option value="admin" <?= $user['role'] === 'admin' ? 'selected' : '' ?>>Admin</option>
+                            </select>
+                        </td>
+                        <td class="d-flex gap-2">
+                            <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-floppy"></i> Save</button>
+                            </form>
 
-                                <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-floppy"></i> Save</button>
+                            <button type="button"
+                                class="btn-outline-secondary btn btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#passwordModal"
+                                data-user-id="<?= $user['id'] ?>"
+                                data-username="<?= htmlspecialchars($user['username']) ?>">
+                                <i class="bi bi-lock"></i> Password
+                            </button>
 
-                                <button type="button"
-                                    class="btn-outline-secondary btn btn-sm"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#passwordModal"
-                                    data-user-id="<?= $user['id'] ?>"
-                                    data-username="<?= htmlspecialchars($user['username']) ?>">
-                                    <i class="bi bi-lock"></i> Password
-                                </button>
-
-                                <form action="/user/delete" method="POST" class="d-inline" onsubmit="return confirm('Delete this user?');">
-                                    <input type="hidden" name="userId" value="<?= $user['id'] ?>">
-                                    <button type="submit" class="btn-outline-danger btn btn-sm"><i class="bi bi-trash3"></i> Delete</button>
-                                </form>
-                            </td>
-                        </form>
+                            <form action="/user/delete" method="POST" class="d-inline" onsubmit="return confirm('Delete this user?');">
+                                <input type="hidden" name="userId" value="<?= $user['id'] ?>">
+                                <button type="submit" class="btn-outline-danger btn btn-sm"><i class="bi bi-trash3"></i> Delete</button>
+                            </form>
+                        </td>
                     </tr>
+
                 <?php endforeach; ?>
             </tbody>
         </table>
@@ -63,6 +64,51 @@
             <i class="bi bi-plus-lg"></i> New User
         </button>
     </div>
+
+    <div class="mt-5 container">
+        <h2>Settings</h2>
+        <ul class="list-group">
+            <?php foreach ($allSettings as $setting): ?>
+                <li class="list-group-item d-flex align-items-center justify-content-between">
+                    <span
+                        <?php if ($setting['key'] === 'registration_enabled'): ?>
+                        data-bs-toggle="tooltip"
+                        title="If enabled, users will be able to register publicly. If disabled, only admins can add new users."
+                        <?php endif; ?>>
+                        <?= htmlspecialchars($setting['key']) ?>
+                    </span>
+
+                    <form action="/settings/update" method="POST" class="d-flex align-items-center gap-2 m-0">
+                        <input type="hidden" name="key" value="<?= htmlspecialchars($setting['key']) ?>">
+
+                        <?php if (in_array($setting['value'], ['0', '1'])): ?>
+                            <input type="hidden" name="value" value="0">
+                            <div class="m-0 form-check form-switch">
+                                <input
+                                    type="checkbox"
+                                    name="value"
+                                    value="1"
+                                    class="form-check-input"
+                                    onchange="this.form.submit()"
+                                    <?= $setting['value'] === '1' ? 'checked' : '' ?>>
+                            </div>
+                        <?php else: ?>
+                            <input
+                                type="text"
+                                name="value"
+                                class="form-control form-control-sm"
+                                value="<?= htmlspecialchars($setting['value']) ?>">
+                            <button type="submit" class="btn btn-sm btn-primary">
+                                <i class="bi bi-floppy"></i>
+                            </button>
+                        <?php endif; ?>
+                    </form>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+
+    </div>
+
 
     <!-- Change Password Modal -->
     <div class="modal fade" id="passwordModal" tabindex="-1">
@@ -162,6 +208,10 @@
                     toastBody.textContent = 'New user created!';
                     toastEl.classList.remove('bg-danger', 'text-white');
                     toastEl.classList.add('bg-white', 'text-dark');
+                <?php elseif ($_GET['status'] === 'setting_updated'): ?>
+                    toastBody.textContent = 'Setting updated!';
+                    toastEl.classList.remove('bg-danger', 'text-white');
+                    toastEl.classList.add('bg-white', 'text-dark');
                 <?php else: ?>
                     toastBody.textContent = <?= json_encode('Error: ' . ($_GET['msg'] ?? 'Unknown error')) ?>;
                     toastEl.classList.remove('bg-white', 'text-dark');
@@ -172,6 +222,16 @@
             });
         </script>
     <?php endif; ?>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Password modal init...
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.forEach(tooltipTriggerEl => {
+                new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
 
 
 </body>

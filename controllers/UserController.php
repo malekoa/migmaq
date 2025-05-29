@@ -18,9 +18,32 @@ class UserController
 
         $stmt = $this->pdo->query("SELECT id, username, email, role FROM users ORDER BY id ASC");
         $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $pdo = $this->pdo;
+        $allSettings = getAllSettings($this->pdo);
 
         require __DIR__ . '/../views/manage_users.php';
     }
+
+    public function updateSetting(): void
+    {
+        if (!isAdmin()) {
+            http_response_code(403);
+            exit("Access denied");
+        }
+
+        $key = $_POST['key'] ?? null;
+        $value = $_POST['value'] ?? null;
+
+        if ($key === null || $value === null) {
+            http_response_code(400);
+            exit("Missing key or value");
+        }
+
+        setSetting($this->pdo, $key, $value);
+        header("Location: /dashboard/manage-users?status=setting_updated");
+        exit();
+    }
+
 
     public function updateRole(): void
     {
@@ -130,5 +153,18 @@ class UserController
 
         http_response_code(400);
         exit("Missing ID");
+    }
+
+    public function toggleRegistration(): void
+    {
+        if (!isAdmin()) {
+            http_response_code(403);
+            exit("Access denied");
+        }
+
+        $enabled = $_POST['enabled'] ?? '0';
+        setSetting($this->pdo, 'registration_enabled', $enabled === '1' ? '1' : '0');
+        header("Location: /dashboard/manage-users?status=registration_updated");
+        exit;
     }
 }

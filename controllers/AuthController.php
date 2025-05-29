@@ -50,13 +50,28 @@ class AuthController
     {
         $errors = [];
         $success = isset($_GET['success']);
+
+        if (getSetting($this->pdo, 'registration_enabled', '1') !== '1') {
+            $errors[] = "Registration has been disabled by the administrator. Please contact them to create an account.";
+            require __DIR__ . '/../views/register.php';
+            return;
+        }
+
         require __DIR__ . '/../views/register.php';
     }
+
 
     public function register()
     {
         $errors = [];
         $success = false;
+
+        // ✅ FIRST: Check if registration is disabled
+        if (getSetting($this->pdo, 'registration_enabled', '1') !== '1') {
+            $errors[] = "Registration has been disabled by the administrator. Please contact them to create an account.";
+            require __DIR__ . '/../views/register.php';
+            return;
+        }
 
         $username = trim($_POST['username'] ?? '');
         $email = trim($_POST['email'] ?? '');
@@ -97,6 +112,7 @@ class AuthController
 
         require __DIR__ . '/../views/register.php';
     }
+
 
     public function logout()
     {

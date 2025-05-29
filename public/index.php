@@ -59,6 +59,8 @@ $routes = [
         '/lesson/save' => fn() => (new LessonController($pdo))->save(),
         '/lesson/delete' => fn() => (new LessonController($pdo))->delete(),
         '/lesson/update-order' => fn() => (new LessonController($pdo))->updateOrder(),
+        '/settings/registration' => fn() => (new UserController($pdo))->toggleRegistration(),
+        '/settings/update' => fn() => (new UserController($pdo))->updateSetting(),
     ]
 ];
 
