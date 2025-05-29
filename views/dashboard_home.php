@@ -11,6 +11,9 @@
             <li class="list-group-item">
                 <a href="/dashboard/unit-editor">📚 Unit Editor</a>
             </li>
+            <li class="list-group-item">
+                <a href="/dashboard/account">👤 Manage Account</a>
+            </li>
             <?php if (isAdmin()): ?>
                 <li class="list-group-item">
                     <a href="/dashboard/manage-users">⚙️ Admin Settings</a>

@@ -167,4 +167,73 @@ class UserController
         header("Location: /dashboard/manage-users?status=registration_updated");
         exit;
     }
+
+    public function showAccount(): void
+    {
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: /login");
+            exit();
+        }
+
+        $userId = $_SESSION['user_id'];
+        $stmt = $this->pdo->prepare("SELECT username, email FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user) {
+            http_response_code(404);
+            exit("User not found");
+        }
+
+        require __DIR__ . '/../views/account.php';
+    }
+
+    public function changeOwnPassword(): void
+    {
+        if (!isset($_SESSION['user_id'])) {
+            http_response_code(403);
+            exit("Unauthorized");
+        }
+
+        $currentPassword = $_POST['current_password'] ?? '';
+        $newPassword = $_POST['new_password'] ?? '';
+        $confirmPassword = $_POST['confirm_password'] ?? '';
+        $userId = $_SESSION['user_id'];
+
+        $errors = [];
+
+        if (!$currentPassword || !$newPassword || !$confirmPassword) {
+            $errors[] = "All fields are required.";
+        }
+
+        if ($newPassword !== $confirmPassword) {
+            $errors[] = "New passwords do not match.";
+        }
+
+        if (strlen($newPassword) < 6) {
+            $errors[] = "Password must be at least 6 characters.";
+        }
+
+        $stmt = $this->pdo->prepare("SELECT password FROM users WHERE id = ?");
+        $stmt->execute([$userId]);
+        $hash = $stmt->fetchColumn();
+
+        if (!$hash || !password_verify($currentPassword, $hash)) {
+            $errors[] = "Current password is incorrect.";
+        }
+
+        if ($errors) {
+            $_SESSION['account_errors'] = $errors;
+            header("Location: /dashboard/account");
+            exit;
+        }
+
+        $newHash = password_hash($newPassword, PASSWORD_DEFAULT);
+        $stmt = $this->pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
+        $stmt->execute([$newHash, $userId]);
+
+        $_SESSION['account_success'] = true;
+        header("Location: /dashboard/account");
+        exit;
+    }
 }
