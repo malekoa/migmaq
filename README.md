@@ -152,6 +152,5 @@ When working on a feature:
 ## Questions?
 
 Talk to the maintainer or check the relevant controller/view.
-Each route is self-contained and declaratively mapped in `index.php`.
 
 Happy coding! 🎉
