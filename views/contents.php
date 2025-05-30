@@ -9,48 +9,47 @@
         <div class="mt-5 container">
             <h1 class="mb-4">📖 Table of Contents</h1>
 
-            <div class="row g-4">
-                <?php foreach ($units as $unit): ?>
-                    <div class="col-12 col-md-6 col-lg-4">
-                        <div class="shadow-sm h-100 card">
-                            <div class="card-body">
-                                <h4 class="mb-3 card-title">
-                                    <a href="/unit?id=<?= $unit['id'] ?>" class="">
-                                        <?= htmlspecialchars($unit['title']) ?>
-                                    </a>
-                                </h4>
+            <ol class="list-unstyled">
+                <?php foreach ($units as $uIndex => $unit): ?>
+                    <li class="mb-3">
+                        <strong>
+                            <?= ($uIndex + 1) ?>. 
+                            <a href="/unit?id=<?= $unit['id'] ?>" class="text-dark">
+                                <?= htmlspecialchars($unit['title']) ?>
+                            </a>
+                        </strong>
 
-                                <?php foreach ($unit['sections'] as $section): ?>
-                                    <div class="mb-3 ps-2 border-start">
-                                        <div class="mb-1 text-secondary fw-semibold">
-                                            <i class="me-1 bi bi-folder"></i>
-                                            <a href="/section?id=<?= $section['id'] ?>" class="text-decoration-none">
-                                                <?= htmlspecialchars($section['title']) ?>
-                                            </a>
-                                        </div>
-                                        <ul class="ps-3 border-start list-unstyled">
-                                            <?php foreach ($section['lessons'] as $lesson): ?>
-                                                <li>
-                                                    <i class="me-1 text-muted bi bi-file-text"></i>
-                                                    <a href="/lesson?id=<?= $lesson['id'] ?>" class="text-decoration-none">
-                                                        <?= htmlspecialchars($lesson['title']) ?>
-                                                    </a>
-                                                </li>
-                                            <?php endforeach; ?>
-                                        </ul>
-                                    </div>
+                        <?php if (!empty($unit['sections'])): ?>
+                            <ol class="ms-4 mt-2 list-unstyled">
+                                <?php foreach ($unit['sections'] as $sIndex => $section): ?>
+                                    <li class="mb-1">
+                                        <?= ($uIndex + 1) . '.' . ($sIndex + 1) ?>.
+                                        <a href="/section?id=<?= $section['id'] ?>" class="text-dark">
+                                            <?= htmlspecialchars($section['title']) ?>
+                                        </a>
+
+                                        <?php if (!empty($section['lessons'])): ?>
+                                            <ol class="ms-4 mt-1 list-unstyled">
+                                                <?php foreach ($section['lessons'] as $lIndex => $lesson): ?>
+                                                    <li>
+                                                        <?= ($uIndex + 1) . '.' . ($sIndex + 1) . '.' . ($lIndex + 1) ?>.
+                                                        <a href="/lesson?id=<?= $lesson['id'] ?>" class="text-dark">
+                                                            <?= htmlspecialchars($lesson['title']) ?>
+                                                        </a>
+                                                    </li>
+                                                <?php endforeach; ?>
+                                            </ol>
+                                        <?php endif; ?>
+                                    </li>
                                 <?php endforeach; ?>
-                            </div>
-
-                        </div>
-                    </div>
+                            </ol>
+                        <?php endif; ?>
+                    </li>
                 <?php endforeach; ?>
-            </div>
+            </ol>
         </div>
-
     </main>
 
     <?php require __DIR__ . '/partials/footer.php'; ?>
 </body>
-
 </html>
