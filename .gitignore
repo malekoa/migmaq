@@ -1,3 +1,5 @@
+audio
+master.xml
+units.sections.lessons.md
 *.db
-*.py
 .DS_STORE
