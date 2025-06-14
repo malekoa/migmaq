@@ -53,9 +53,10 @@ def handle_audio_file(filename, lesson_path=None):
     return cursor.lastrowid
 
 
-def convert_audio_section_to_html(tag, lesson_path=None):
+def convert_audio_section_to_html(tag, lesson_path=None, heading_override=None):
     """Convert <dialog> or <vocab> tag to a table with audio."""
-    heading = "Dialog" if tag.tag == "dialog" else "Vocabulary"
+    default_heading = "Dialog" if tag.tag == "dialog" else "Vocabulary"
+    heading = heading_override or default_heading
     table_rows = [f"<h2>{heading}</h2>", "<table><tbody>"]
 
     for line in tag.findall('line'):
@@ -138,12 +139,14 @@ for i, section in enumerate(root.findall('section')):
             lesson_path = f"{unit_title} > {section_title} > {lesson_title}"
             print(f"Inserting {lesson_path}:")
 
-            # Convert dialog/vocab if present
+            # Convert all dialogs and vocabs
             for audio_tag in ['dialog', 'vocab']:
-                audio_elem = lesson.find(audio_tag)
-                if audio_elem is not None:
-                    lesson_body_parts.append(convert_audio_section_to_html(audio_elem, lesson_path=lesson_path))
-
+                elements = lesson.findall(audio_tag)
+                for index, audio_elem in enumerate(elements, start=1):
+                    heading = f"{audio_tag.capitalize()} {index}" if len(elements) > 1 else audio_tag.capitalize()
+                    lesson_body_parts.append(
+                        convert_audio_section_to_html(audio_elem, lesson_path=lesson_path, heading_override=heading)
+                    )
 
             lesson_body = '\n'.join(lesson_body_parts)
 
