@@ -3,3 +3,4 @@ master.xml
 units.sections.lessons.md
 *.db
 .DS_STORE
+.env
