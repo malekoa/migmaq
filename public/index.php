@@ -13,8 +13,6 @@ require_once __DIR__ . '/../controllers/LessonController.php';
 require_once __DIR__ . '/../controllers/ContentsController.php';
 require_once __DIR__ . '/../controllers/PageController.php';
 
-
-
 // Normalize the path
 $uri = rtrim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
 if ($uri === '') $uri = '/';
