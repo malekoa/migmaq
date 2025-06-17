@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/../lib/sendmail.php';
+
+
 class AuthController
 {
     private $pdo;
@@ -111,6 +114,123 @@ class AuthController
         }
 
         require __DIR__ . '/../views/register.php';
+    }
+
+    public function showForgotPasswordForm()
+    {
+        $errors = [];
+        $success = false;
+        require __DIR__ . '/../views/forgot_password.php';
+    }
+
+    public function handleForgotPassword()
+    {
+        $email = trim($_POST['email'] ?? '');
+        $errors = [];
+        $success = false;
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $errors[] = "Invalid email address.";
+        } else {
+            $stmt = $this->pdo->prepare("SELECT username FROM users WHERE email = ?");
+            $stmt->execute([$email]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$user) {
+                $errors[] = "No account found with that email.";
+            } else {
+                // Remove any existing tokens for this email
+                $stmt = $this->pdo->prepare("DELETE FROM password_resets WHERE email = ?");
+                $stmt->execute([$email]);
+
+                // Now insert the new token
+                $rawToken = bin2hex(random_bytes(32)); // sent to user
+                $hashedToken = hash('sha256', $rawToken); // stored in DB
+                $expiresAt = date('Y-m-d H:i:s', time() + 3600);
+
+                $stmt = $this->pdo->prepare("INSERT INTO password_resets (email, token, expires_at) VALUES (?, ?, ?)");
+                $stmt->execute([$email, $hashedToken, $expiresAt]);
+
+                $resetLink = "https://" . $_SERVER['HTTP_HOST'] . "/reset-password?token=$rawToken";
+
+                $body = "<p>Hi {$user['username']},</p>
+                     <p>Click the link below to reset your password:</p>
+                     <p><a href=\"$resetLink\">Reset Password</a></p>
+                     <p>This link will expire in 1 hour.</p>";
+
+                sendMail($email, $user['username'], "Password Reset", $body, true);
+
+                $success = true;
+            }
+        }
+
+        require __DIR__ . '/../views/forgot_password.php';
+    }
+
+    public function showResetPasswordForm()
+    {
+        $token = $_GET['token'] ?? '';
+        $errors = [];
+
+        if (!$token) {
+            $errors[] = "Invalid or missing token.";
+            require __DIR__ . '/../views/reset_password.php';
+            return;
+        }
+
+        $hashedToken = hash('sha256', $token);
+
+        $stmt = $this->pdo->prepare("SELECT email FROM password_resets WHERE token = ? AND expires_at > datetime('now')");
+        $stmt->execute([$hashedToken]);
+        $entry = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$entry) {
+            // Check if token exists, but expired
+            $stmt = $this->pdo->prepare("SELECT 1 FROM password_resets WHERE token = ?");
+            $stmt->execute([$hashedToken]);
+            if ($stmt->fetch()) {
+                $errors[] = "This token has expired. Please request a new password reset link.";
+            } else {
+                $errors[] = "Invalid reset link.";
+            }
+        }
+
+        require __DIR__ . '/../views/reset_password.php';
+    }
+
+    public function handleResetPassword()
+    {
+        $token = $_POST['token'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $errors = [];
+
+        if (strlen($password) < 6) {
+            $errors[] = "Password must be at least 6 characters.";
+        }
+
+        $hashedToken = hash('sha256', $token);
+        $stmt = $this->pdo->prepare("SELECT email FROM password_resets WHERE token = ? AND expires_at > datetime('now')");
+        $stmt->execute([$hashedToken]);
+
+        $entry = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$entry) {
+            $errors[] = "Invalid or expired token.";
+        }
+
+        if (empty($errors)) {
+            $hashed = password_hash($password, PASSWORD_DEFAULT);
+            $stmt = $this->pdo->prepare("UPDATE users SET password = ? WHERE email = ?");
+            $stmt->execute([$hashed, $entry['email']]);
+
+            $stmt = $this->pdo->prepare("DELETE FROM password_resets WHERE email = ?");
+            $stmt->execute([$entry['email']]);
+
+            header("Location: /login?reset=success");
+            exit();
+        }
+
+        require __DIR__ . '/../views/reset_password.php';
     }
 
 

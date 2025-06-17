@@ -1,7 +1,16 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) {
+    session_set_cookie_params([
+        'lifetime' => 0, // Session cookie (until browser is closed)
+        'path' => '/',
+        'domain' => $_SERVER['HTTP_HOST'],
+        'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off', // can only send over HTTPS
+        'httponly' => true, // makes cookies not accessible from JS
+        'samesite' => 'Strict' // prevent CSRF
+    ]);
     session_start();
 }
+
 
 $dbFile = __DIR__ . '/data.db';
 $pdo = new PDO('sqlite:' . __DIR__ . '/../data/data.db');
@@ -15,6 +24,17 @@ $pdo->exec("
         email TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL,
         role TEXT NOT NULL DEFAULT 'contributor' -- can be 'admin' or 'contributor'
+    );
+");
+
+
+// Create password resets table
+$pdo->exec("
+    CREATE TABLE IF NOT EXISTS password_resets (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT NOT NULL,
+        token TEXT UNIQUE NOT NULL,
+        expires_at DATETIME NOT NULL
     );
 ");
 

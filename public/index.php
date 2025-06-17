@@ -27,6 +27,8 @@ $routes = [
         '/login' => fn() => (new AuthController($pdo))->showLogin(),
         '/register' => fn() => (new AuthController($pdo))->showRegister(),
         '/logout' => fn() => (new AuthController($pdo))->logout(),
+        '/forgot-password' => fn() => (new AuthController($pdo))->showForgotPasswordForm(),
+        '/reset-password' => fn() => (new AuthController($pdo))->showResetPasswordForm(),
         '/unit/fetch' => fn() => (new UnitController($pdo))->fetch(),
         '/audio' => fn() => (new AudioController($pdo))->stream(),
         '/section/fetch' => fn() => (new SectionController($pdo))->fetch(),
@@ -43,6 +45,8 @@ $routes = [
     'POST' => [
         '/login' => fn() => (new AuthController($pdo))->login(),
         '/register' => fn() => (new AuthController($pdo))->register(),
+        '/forgot-password' => fn() => (new AuthController($pdo))->handleForgotPassword(),
+        '/reset-password' => fn() => (new AuthController($pdo))->handleResetPassword(),
         '/user/update-role' => fn() => (new UserController($pdo))->updateRole(),
         '/user/change-password' => fn() => (new UserController($pdo))->changePassword(),
         '/user/self-password' => fn() => (new UserController($pdo))->changeOwnPassword(),
