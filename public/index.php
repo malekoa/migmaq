@@ -22,6 +22,10 @@ $method = $_SERVER['REQUEST_METHOD'];
 $routes = [
     'GET' => [
         '/' => fn() => (new PageController($pdo))->landing(),
+        '/about' => fn() => require __DIR__ . '/../views/about.php',
+        '/privacy' => fn() => require __DIR__ . '/../views/privacy.php',
+        '/contact' => fn() => require __DIR__ . '/../views/contact.php',
+        '/welalieg' => fn() => require __DIR__ . '/../views/welalieg.php',
         '/contents' => fn() => (new ContentsController($pdo))->show(),
         '/dashboard' => fn() => (new DashboardController($pdo))->index(),
         '/login' => fn() => (new AuthController($pdo))->showLogin(),

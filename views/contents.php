@@ -24,7 +24,7 @@
                 <div class="mb-5">
                     <h3 class="mb-4 fw-bold">
                         📘 <?= ($uIndex + 1) ?>.
-                        <a href="/unit?id=<?= $unit['id'] ?>" class="text-primary text-decoration-none">
+                        <a href="/unit?id=<?= $unit['id'] ?>" class="text-dark text-primary text-decoration-none">
                             <?= htmlspecialchars($unit['title']) ?>
                         </a>
                     </h3>
@@ -33,21 +33,23 @@
                         <div class="row row-cols-1 row-cols-md-2 g-4">
                             <?php foreach ($unit['sections'] as $sIndex => $section): ?>
                                 <div class="col">
-                                    <div class="shadow-sm h-100 card">
+                                    <div class="position-relative shadow-sm h-100 card">
                                         <div class="card-body">
                                             <h5 class="card-title fw-semibold">
                                                 📗 <?= ($uIndex + 1) . '.' . ($sIndex + 1) ?>.
-                                                <a href="/section?id=<?= $section['id'] ?>" class="text-dark text-decoration-none">
-                                                    <?= htmlspecialchars($section['title']) ?>
-                                                </a>
+                                                <?= htmlspecialchars($section['title']) ?>
                                             </h5>
 
+                                            <!-- Invisible stretched link to the unit page -->
+                                            <a href="/section?id=<?= $section['id'] ?>" class="stretched-link"></a>
+
+
                                             <?php if (!empty($section['lessons'])): ?>
-                                                <ul class="ms-2 mt-3 list-unstyled">
+                                                <ul class="position-relative ms-2 mt-3 list-unstyled" style="z-index: 1;">
                                                     <?php foreach ($section['lessons'] as $lIndex => $lesson): ?>
                                                         <li class="mb-1">
                                                             📙 <?= ($uIndex + 1) . '.' . ($sIndex + 1) . '.' . ($lIndex + 1) ?>.
-                                                            <a href="/lesson?id=<?= $lesson['id'] ?>" class="text-secondary text-decoration-none">
+                                                            <a href="/lesson?id=<?= $lesson['id'] ?>" class="position-relative text-secondary text-decoration-none" style="z-index: 3;">
                                                                 <?= htmlspecialchars($lesson['title']) ?>
                                                             </a>
                                                         </li>

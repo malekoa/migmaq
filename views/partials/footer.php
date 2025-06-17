@@ -1,3 +1,8 @@
+<style>
+    footer a:hover {
+        text-decoration: underline !important;
+    }
+</style>
 <footer class="mt-5 pt-4 pb-3 border-top text-bg-light">
     <div class="container">
         <div class="align-items-center justify-content-between row">
@@ -7,13 +12,14 @@
                     <li class="list-inline-item"><a href="/about" class="text-muted text-decoration-none">About</a></li>
                     <li class="list-inline-item"><a href="/privacy" class="text-muted text-decoration-none">Privacy Policy</a></li>
                     <li class="list-inline-item"><a href="/contact" class="text-muted text-decoration-none">Contact</a></li>
+                    <li class="list-inline-item"><a href="/welalieg" class="text-muted text-decoration-none">Wela'lieg</a></li>
                 </ul>
             </div>
 
             <!-- Right side: Admin/editor link -->
             <div class="text-md-end col-md-6">
                 <a href="/dashboard/unit-editor" class="text-muted text-decoration-none">
-                    ✏️ Editor Dashboard
+                    Editor Dashboard
                 </a>
             </div>
         </div>
