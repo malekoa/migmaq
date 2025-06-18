@@ -99,6 +99,7 @@ class PageController
             exit('Lesson not found');
         }
 
+        $adjacent = $lessonModel->getAdjacentLessons((int)$lessonId);
         require __DIR__ . '/../views/show_lesson.php';
     }
 }

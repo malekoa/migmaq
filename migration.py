@@ -78,6 +78,33 @@ def convert_audio_section_to_html(tag, lesson_path=None, heading_override=None):
     table_rows.append("</tbody></table>")
     return '\n'.join(table_rows)
 
+def convert_activity_to_html(activity_elem, lesson_path=None):
+    html = ["<h2>Activity</h2>"]
+
+    # Intro paragraph
+    intro_text = activity_elem.findtext('intro', default='').strip()
+    if intro_text:
+        html.append(f"<p>{intro_text}</p>")
+
+    html.append("<table><tbody>")
+
+    for item in activity_elem.findall('.//item'):
+        migmaq = item.findtext('.//first/migmaq', default='').strip()
+        soundfile_name = item.findtext('.//second/soundfile', default='').strip() + ".mp3"
+        audio_id = handle_audio_file(soundfile_name, lesson_path=lesson_path)
+
+        audio_html = f"""
+        <div class="se-component">
+          <figure>
+            <audio controls="true" src="/audio?id={audio_id}" data-file-name="{soundfile_name}"></audio>
+          </figure>
+        </div>""" if audio_id else "<!-- Audio not found -->"
+
+        html.append(f"<tr><td><div>{migmaq}</div></td><td>{audio_html}</td></tr>")
+
+    html.append("</tbody></table>")
+    return '\n'.join(html)
+
 
 def convert_element_to_html(elem):
     """Recursively convert XML elements to HTML strings."""
@@ -141,6 +168,11 @@ for i, section in enumerate(root.findall('section')):
 
             # Convert all dialogs and vocabs
             for audio_tag in ['dialog', 'vocab']:
+                # Convert activity if present
+                activity_elem = lesson.find('activity')
+                if activity_elem is not None:
+                    lesson_body_parts.append(convert_activity_to_html(activity_elem, lesson_path=lesson_path))
+
                 elements = lesson.findall(audio_tag)
                 for index, audio_elem in enumerate(elements, start=1):
                     heading = f"{audio_tag.capitalize()} {index}" if len(elements) > 1 else audio_tag.capitalize()

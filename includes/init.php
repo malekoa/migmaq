@@ -11,6 +11,22 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Load .env file and populate getenv()
+$envPath = __DIR__ . '/../.env';
+
+if (file_exists($envPath)) {
+    foreach (file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+        $line = trim($line);
+        if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) continue;
+
+        list($key, $value) = explode('=', $line, 2);
+        $key = trim($key);
+        $value = trim($value, " \t\n\r\0\x0B\"'");
+
+        // Set it for getenv(), $_ENV, and $_SERVER
+        putenv("$key=$value");
+    }
+}
 
 $dbFile = __DIR__ . '/data.db';
 $pdo = new PDO('sqlite:' . __DIR__ . '/../data/data.db');

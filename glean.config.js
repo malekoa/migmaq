@@ -6,41 +6,33 @@ module.exports = {
     "!lib/PHPMailer"
   ],
   "blocks": {
-    "core": [
-      "lib/sendmail.php",
-      "views/account.php",
-      "views/forgot_password.php",
-      "views/login.php",
-      "views/manage_users.php",
-      "views/register.php",
-      "views/reset_password.php",
-      "controllers/AuthController.php",
-      "controllers/UserController.php",
-      "includes/helpers.php",
-      "includes/init.php",
-      ".example.env"
-    ],
-    "static": [
-      "views/404.php",
-      "views/account.php",
-      "views/contents.php",
-      "views/dashboard_home.php",
-      "views/forgot_password.php",
-      "views/landing.php",
-      "views/lesson_editor.php",
-      "views/login.php",
-      "views/manage_users.php",
-      "views/register.php",
-      "views/reset_password.php",
-      "views/section_editor.php",
+    "nextprev": [
+      "views/partials/content_navbar.php",
+      "views/partials/dashboard_navbar.php",
+      "views/partials/footer.php",
+      "views/partials/head.php",
+      "views/partials/lesson_modal.php",
+      "views/partials/section_modal.php",
+      "views/partials/toast.php",
+      "views/partials/unit_modal.php",
       "views/show_lesson.php",
       "views/show_section.php",
       "views/show_unit.php",
-      "views/unit_editor.php",
       "views/units.php",
-      "includes/helpers.php",
+      "public/index.php",
+      "models/Lesson.php",
+      "models/Section.php",
+      "models/Unit.php",
       "includes/init.php",
-      "public/index.php"
+      "controllers/AudioController.php",
+      "controllers/AuthController.php",
+      "controllers/ContentsController.php",
+      "controllers/DashboardController.php",
+      "controllers/LessonController.php",
+      "controllers/PageController.php",
+      "controllers/SectionController.php",
+      "controllers/UnitController.php",
+      "controllers/UserController.php"
     ]
   }
 };

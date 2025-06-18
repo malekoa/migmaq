@@ -80,4 +80,33 @@ class Lesson
             ]);
         }
     }
+
+    public function getAdjacentLessons(int $lessonId): array
+    {
+        $stmt = $this->pdo->prepare("SELECT section_id, position FROM lessons WHERE id = ?");
+        $stmt->execute([$lessonId]);
+        $current = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$current) return ['prev' => null, 'next' => null];
+
+        // Get previous lesson
+        $stmt = $this->pdo->prepare("
+        SELECT id, title FROM lessons
+        WHERE section_id = ? AND position < ?
+        ORDER BY position DESC LIMIT 1
+    ");
+        $stmt->execute([$current['section_id'], $current['position']]);
+        $prev = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Get next lesson
+        $stmt = $this->pdo->prepare("
+        SELECT id, title FROM lessons
+        WHERE section_id = ? AND position > ?
+        ORDER BY position ASC LIMIT 1
+    ");
+        $stmt->execute([$current['section_id'], $current['position']]);
+        $next = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return ['prev' => $prev, 'next' => $next];
+    }
 }
