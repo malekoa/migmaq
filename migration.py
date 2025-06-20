@@ -90,6 +90,7 @@ def convert_activity_to_html(activity_elem, lesson_path=None):
 
     for item in activity_elem.findall('.//item'):
         migmaq = item.findtext('.//first/migmaq', default='').strip()
+        english = item.findtext('.//second/english', default='').strip()
         soundfile_name = item.findtext('.//second/soundfile', default='').strip() + ".mp3"
         audio_id = handle_audio_file(soundfile_name, lesson_path=lesson_path)
 
@@ -100,10 +101,12 @@ def convert_activity_to_html(activity_elem, lesson_path=None):
           </figure>
         </div>""" if audio_id else "<!-- Audio not found -->"
 
-        html.append(f"<tr><td><div>{migmaq}</div></td><td>{audio_html}</td></tr>")
+        left_cell = f"<div>{migmaq}<br><em>{english}</em></div>"
+        html.append(f"<tr><td>{left_cell}</td><td>{audio_html}</td></tr>")
 
     html.append("</tbody></table>")
     return '\n'.join(html)
+
 
 
 def convert_element_to_html(elem):

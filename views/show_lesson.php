@@ -4,6 +4,7 @@
 
 <body class="d-flex flex-column min-vh-100">
     <?php require __DIR__ . '/partials/content_navbar.php'; ?>
+    <?php require __DIR__ . '/partials/toc_offcanvas.php'; ?>
 
     <main class="flex-grow-1">
         <div class="mt-5 container">
