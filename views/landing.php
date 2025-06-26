@@ -15,13 +15,13 @@
 
                 <!-- Social Icons -->
                 <div class="d-flex gap-3">
-                    <a href="#" class="text-white fs-4" title="Facebook">
+                    <a href="https://www.facebook.com/groups/learnmigmaq" class="text-white fs-4" title="Facebook">
                         <i class="bi bi-facebook"></i>
                     </a>
-                    <a href="#" class="text-white fs-4" title="X (Twitter)">
+                    <a href="https://x.com/learnmigmaq" class="text-white fs-4" title="X (Twitter)">
                         <i class="bi bi-twitter-x"></i>
                     </a>
-                    <a href="#" class="text-white fs-4" title="Instagram">
+                    <a href="https://www.instagram.com/learnmigmaq" class="text-white fs-4" title="Instagram">
                         <i class="bi bi-instagram"></i>
                     </a>
                 </div>
