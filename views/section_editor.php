@@ -13,7 +13,7 @@
     <?php require __DIR__ . '/partials/section_modal.php'; ?>
 
     <div class="mt-5 container">
-        <h2>Sections for Unit: <?= htmlspecialchars($unit['title']) ?></h2>
+        <h2>📝 Sections for Unit: <?= htmlspecialchars($unit['title']) ?></h2>
         <?php if (empty($sections)): ?>
             <p>No sections yet.</p>
         <?php else: ?>

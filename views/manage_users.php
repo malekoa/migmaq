@@ -7,7 +7,9 @@
 
 
     <div class="mt-5 container">
-        <h2>Manage Users</h2>
+        <h1>⚙️ Admin Settings</h1>
+        <br>
+        <h2>👥 Manage Users</h2>
         <table class="table align-middle">
             <thead>
                 <tr>
@@ -66,7 +68,7 @@
     </div>
 
     <div class="mt-5 container">
-        <h2>Settings</h2>
+        <h2>🛠️ Settings</h2>
         <ul class="list-group">
             <?php foreach ($allSettings as $setting): ?>
                 <li class="list-group-item d-flex align-items-center justify-content-between">

@@ -5,7 +5,7 @@
 <?php require __DIR__ . '/partials/dashboard_navbar.php'; ?>
 
 <div class="mt-5 container">
-    <h2>Manage Account</h2>
+    <h2>👤 Manage Account</h2>
 
     <?php if (!empty($_SESSION['account_errors'])): ?>
         <div class="alert alert-danger">

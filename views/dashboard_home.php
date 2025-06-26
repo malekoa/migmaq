@@ -6,7 +6,7 @@
     <?php require __DIR__ . '/partials/dashboard_navbar.php'; ?>
 
     <div class="mt-5 container">
-        <h2>Dashboard</h2>
+        <h2>🏠 Dashboard Home</h2>
         <ul class="list-group">
             <li class="list-group-item">
                 <a href="/dashboard/unit-editor">📚 Unit Editor</a>

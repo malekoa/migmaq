@@ -18,7 +18,7 @@
 
             <!-- Right side: Admin/editor link -->
             <div class="text-md-end col-md-6">
-                <a href="/dashboard/unit-editor" class="text-muted text-decoration-none">
+                <a href="/dashboard" class="text-muted text-decoration-none">
                     Editor Dashboard
                 </a>
             </div>

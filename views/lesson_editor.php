@@ -17,7 +17,7 @@
     <?php require __DIR__ . '/partials/lesson_modal.php'; ?>
 
     <div class="mt-5 container">
-        <h2>Lessons for Section: <?= htmlspecialchars($section['title']) ?></h2>
+        <h2>📝 Lessons for Section: <?= htmlspecialchars($section['title']) ?></h2>
 
         <?php if (empty($lessons)): ?>
             <p>No lessons in this section yet.</p>

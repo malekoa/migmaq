@@ -1,12 +1,12 @@
 <?php
 $host = $_SERVER['HTTP_HOST'];
-$domain = explode(':', $host)[0]; // remove port if present
+$domain = explode(':', $host)[0]; // remove port if present (for local dev)
 
 if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
         'lifetime' => 0,
         'path' => '/',
-        'domain' => $domain, // e.g., "myapp.com" or "dashboard.myapp.com"
+        'domain' => $domain,
         'secure' => true, // requires HTTPS in production
         'httponly' => true,
         'samesite' => 'Strict'

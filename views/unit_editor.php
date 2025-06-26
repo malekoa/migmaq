@@ -20,7 +20,7 @@
 
     <!-- Unit Editor View -->
     <div class="mt-5 container">
-        <h2>Unit Editor</h2>
+        <h2>📝 Unit Editor</h2>
         <?php if (empty($units)): ?>
             <p>No units added yet.</p>
         <?php else: ?>
