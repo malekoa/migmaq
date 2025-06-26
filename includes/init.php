@@ -1,15 +1,19 @@
 <?php
+$host = $_SERVER['HTTP_HOST'];
+$domain = explode(':', $host)[0]; // remove port if present
+
 if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
-        'lifetime' => 0, // Session cookie (until browser is closed)
+        'lifetime' => 0,
         'path' => '/',
-        'domain' => $_SERVER['HTTP_HOST'],
-        'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off', // can only send over HTTPS
-        'httponly' => true, // makes cookies not accessible from JS
-        'samesite' => 'Strict' // prevent CSRF
+        'domain' => $domain, // e.g., "myapp.com" or "dashboard.myapp.com"
+        'secure' => true, // requires HTTPS in production
+        'httponly' => true,
+        'samesite' => 'Strict'
     ]);
     session_start();
 }
+
 
 // Load .env file and populate getenv()
 $envPath = __DIR__ . '/../.env';
