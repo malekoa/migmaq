@@ -1,4 +1,5 @@
-<?php // views/partials/lesson_modal.php ?>
+<?php // views/partials/lesson_modal.php 
+?>
 <div class="modal modal-xl fade" id="lessonModal" tabindex="-1" aria-labelledby="lessonModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -23,6 +24,8 @@
                         <option value="draft">Draft</option>
                         <option value="published">Published</option>
                     </select>
+                    <?= csrf_input() ?>
+
                 </form>
             </div>
             <div class="modal-footer">

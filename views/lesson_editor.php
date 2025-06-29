@@ -47,6 +47,7 @@
                                     <input type="hidden" name="lessonId" value="<?= htmlspecialchars($lesson['id']) ?>">
                                     <input type="hidden" name="unitId" value="<?= htmlspecialchars($section['unit_id']) ?>">
                                     <input type="hidden" name="sectionId" value="<?= htmlspecialchars($section['id']) ?>">
+                                    <?= csrf_input() ?>
                                     <button type="submit" class="btn-outline-danger btn btn-sm"
                                         onclick="return confirm('Delete this lesson?')">
                                         <i class="bi bi-trash"></i>

@@ -48,6 +48,7 @@
                                 <form action="/section/delete" method="POST" class="d-inline">
                                     <input type="hidden" name="sectionId" value="<?= htmlspecialchars($section['id']) ?>">
                                     <input type="hidden" name="unitId" value="<?= htmlspecialchars($unit['id']) ?>">
+                                    <?= csrf_input() ?>
                                     <button type="submit" class="btn-outline-danger btn btn-sm" onclick="return confirm('Delete this section?')">
                                         <i class="bi bi-trash"></i>
                                     </button>

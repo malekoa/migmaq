@@ -19,6 +19,8 @@ class AuthController
 
     public function login()
     {
+        verify_csrf_token_or_die();
+
         $errors = [];
 
         $email = trim($_POST['email'] ?? '');
@@ -66,6 +68,8 @@ class AuthController
 
     public function register()
     {
+        verify_csrf_token_or_die();
+
         $errors = [];
         $success = false;
 
@@ -125,6 +129,8 @@ class AuthController
 
     public function handleForgotPassword()
     {
+        verify_csrf_token_or_die();
+
         $email = trim($_POST['email'] ?? '');
         $errors = [];
         $success = false;
@@ -200,6 +206,8 @@ class AuthController
 
     public function handleResetPassword()
     {
+        verify_csrf_token_or_die();
+
         $token = $_POST['token'] ?? '';
         $password = $_POST['password'] ?? '';
         $errors = [];
@@ -238,6 +246,7 @@ class AuthController
     {
         session_destroy();
         header("Location: /login");
+        unset($_SESSION['csrf_token']);
         exit();
     }
 }

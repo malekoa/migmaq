@@ -50,6 +50,8 @@ class UnitController
 
     public function delete(): void
     {
+        verify_csrf_token_or_die();
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             throw new Exception('Invalid request method');
         }
@@ -69,6 +71,8 @@ class UnitController
 
     public function save(): void
     {
+        verify_csrf_token_or_die();
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             throw new Exception('Invalid request method');
         }

@@ -53,6 +53,7 @@
                                     </button>
                                     <form action="/unit/delete" method="POST" class="d-inline">
                                         <input type="hidden" name="unitId" value="<?= htmlspecialchars($unit['id']) ?>">
+                                        <?= csrf_input() ?>
                                         <button type="submit" class="btn-outline-danger btn btn-sm"
                                                 onclick="return confirm('Delete this unit?')">
                                             <i class="bi bi-trash3"></i>

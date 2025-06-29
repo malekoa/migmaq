@@ -42,7 +42,7 @@
                                 name="password"
                                 required>
                         </div>
-
+                        <?= csrf_input() ?>
                         <button type="submit" class="w-100 btn btn-primary">Log In</button>
                     </form>
 

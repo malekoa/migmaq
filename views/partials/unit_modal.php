@@ -20,6 +20,7 @@
                         <option value="draft">Draft</option>
                         <option value="published">Published</option>
                     </select>
+                    <?= csrf_input() ?>
                 </form>
             </div>
             <div class="modal-footer">

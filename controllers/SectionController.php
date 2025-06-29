@@ -24,6 +24,8 @@ class SectionController
 
     public function save(): void
     {
+        verify_csrf_token_or_die();
+
         $data = [
             'id' => $_POST['sectionId'] ?? null,
             'unit_id' => $_POST['unitId'] ?? null,
@@ -50,6 +52,8 @@ class SectionController
 
     public function delete(): void
     {
+        verify_csrf_token_or_die();
+
         $id = $_POST['sectionId'] ?? null;
         $unitId = $_POST['unitId'] ?? null;
 

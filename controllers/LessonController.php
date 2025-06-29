@@ -12,6 +12,8 @@ class LessonController
 
     public function save(): void
     {
+        verify_csrf_token_or_die();
+
         $data = [
             'id' => $_POST['lessonId'] ?? null,
             'section_id' => $_POST['sectionId'] ?? null,
@@ -38,6 +40,8 @@ class LessonController
 
     public function delete(): void
     {
+        verify_csrf_token_or_die();
+
         $id = $_POST['lessonId'] ?? null;
         $unitId = $_POST['unitId'] ?? null;
         $sectionId = $_POST['sectionId'] ?? null;

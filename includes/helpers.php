@@ -19,3 +19,27 @@ function getAllSettings(PDO $pdo): array {
     $stmt = $pdo->query("SELECT `key`, `value` FROM settings");
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+
+function generate_csrf_token() {
+    if (empty($_SESSION['csrf_token'])) {
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
+    return $_SESSION['csrf_token'];
+}
+
+function csrf_input() {
+    return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars(generate_csrf_token()) . '">';
+}
+
+function verify_csrf_token_or_die() {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $token = $_POST['csrf_token'] ?? '';
+        $sessionToken = $_SESSION['csrf_token'] ?? '';
+
+        if (!$token || !$sessionToken || !hash_equals($sessionToken, $token)) {
+            http_response_code(403);
+            exit('Invalid CSRF token');
+        }
+    }
+}
+

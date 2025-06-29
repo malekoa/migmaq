@@ -39,6 +39,8 @@
                             </select>
                         </td>
                         <td class="d-flex gap-2">
+                            <?= csrf_input() ?>
+
                             <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-floppy"></i> Save</button>
                             </form>
 
@@ -53,6 +55,7 @@
 
                             <form action="/user/delete" method="POST" class="d-inline" onsubmit="return confirm('Delete this user?');">
                                 <input type="hidden" name="userId" value="<?= $user['id'] ?>">
+                                <?= csrf_input() ?>
                                 <button type="submit" class="btn-outline-danger btn btn-sm"><i class="bi bi-trash3"></i> Delete</button>
                             </form>
                         </td>
@@ -82,7 +85,7 @@
 
                     <form action="/settings/update" method="POST" class="d-flex align-items-center gap-2 m-0">
                         <input type="hidden" name="key" value="<?= htmlspecialchars($setting['key']) ?>">
-
+                        <?= csrf_input() ?>
                         <?php if (in_array($setting['value'], ['0', '1'])): ?>
                             <input type="hidden" name="value" value="0">
                             <div class="m-0 form-check form-switch">
@@ -125,6 +128,7 @@
                     <label>New Password:</label>
                     <input type="password" name="password" class="form-control" required minlength="6">
                 </div>
+                <?= csrf_input() ?>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">Update Password</button>
                 </div>
@@ -155,6 +159,8 @@
                         <option value="contributor">Contributor</option>
                         <option value="admin">Admin</option>
                     </select>
+                    <?= csrf_input() ?>
+
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-success">Create User</button>

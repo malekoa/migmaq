@@ -35,6 +35,7 @@
             <label for="confirm_password" class="form-label">Confirm New Password</label>
             <input type="password" class="form-control" name="confirm_password" id="confirm_password" required minlength="6">
         </div>
+        <?= csrf_input() ?>
         <button type="submit" class="btn btn-primary">Change Password</button>
     </form>
 </div>

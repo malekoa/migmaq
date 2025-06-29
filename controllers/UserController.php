@@ -26,6 +26,8 @@ class UserController
 
     public function updateSetting(): void
     {
+        verify_csrf_token_or_die();
+
         if (!isAdmin()) {
             http_response_code(403);
             exit("Access denied");
@@ -47,6 +49,8 @@ class UserController
 
     public function updateRole(): void
     {
+        verify_csrf_token_or_die();
+
         if (!isAdmin()) {
             http_response_code(403);
             exit("Access denied");
@@ -68,6 +72,8 @@ class UserController
 
     public function changePassword(): void
     {
+        verify_csrf_token_or_die();
+
         if (!isAdmin()) {
             http_response_code(403);
             exit("Access denied");
@@ -90,6 +96,8 @@ class UserController
 
     public function createUser(): void
     {
+        verify_csrf_token_or_die();
+
         if (!isAdmin()) {
             http_response_code(403);
             exit("Access denied");
@@ -115,6 +123,8 @@ class UserController
 
     public function updateUser(): void
     {
+        verify_csrf_token_or_die();
+
         if (!isAdmin()) {
             http_response_code(403);
             exit("Access denied");
@@ -138,6 +148,8 @@ class UserController
 
     public function deleteUser(): void
     {
+        verify_csrf_token_or_die();
+
         if (!isAdmin()) {
             http_response_code(403);
             exit("Access denied");
@@ -157,6 +169,8 @@ class UserController
 
     public function toggleRegistration(): void
     {
+        verify_csrf_token_or_die();
+
         if (!isAdmin()) {
             http_response_code(403);
             exit("Access denied");
@@ -190,6 +204,8 @@ class UserController
 
     public function changeOwnPassword(): void
     {
+        verify_csrf_token_or_die();
+
         if (!isset($_SESSION['user_id'])) {
             http_response_code(403);
             exit("Unauthorized");
