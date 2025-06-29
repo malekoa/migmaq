@@ -1,156 +1,142 @@
 # Learn Mi'gmaq Online
 
-This document provides a high-level overview of the system architecture, directory structure, and guidance for adding or modifying features.
+Welcome! 👋 This is a redesign of the original Learn Mi'gmaq website using PHP. It includes features like user registration and login, content creation and editing (units, sections, lessons) with a WYSIWYG editor, audio uploads, and administrative user management.
 
-## Overview
+This guide walks you through how to work on the project locally.
 
-This is a PHP-based educational content management system designed to support the creation, management, and delivery of language learning material. The application has a public-facing side (for students/users) and an administrative dashboard (for content contributors/admins).
+---
 
-### Core Features
+## 🚀 Getting Started
 
-* User authentication and registration (public sign-up can be enabled or disabled by an admin)
-* Unit > Section > Lesson hierarchy
-* Rich-text editing using SunEditor
-* Drag-and-drop reordering of units, sections, and lessons
-* Audio file uploading and inline playback
-* Role-based access control (admin/contributor)
-* Settings management by admins
+### Prerequisites
 
-## Project Structure
+Before you start, make sure you have:
 
-```
-├── public/                 # Public entrypoint (index.php)
-├── controllers/            # Application logic (MVC controllers)
-├── models/                 # ORM-like model layer (Unit, Section, Lesson, User, etc.)
-├── views/                  # HTML templates with Bootstrap 5 and SunEditor
-├── includes/
-│   ├── init.php            # DB setup, session, default schema
-│   └── helpers.php         # Utility functions (e.g., isAdmin, getSetting)
-└── data/                   # SQLite data file (data.db)
-```
+* **PHP 8.1+** installed (check with `php -v`)
+* **SQLite** 
+* An email account with SMTP access (like a Gmail account with an App Password) to test password recovery emails.
 
-## Routing
+---
 
-Routes are declared in `public/index.php` as a map of HTTP method → URI → handler function.
+## 💡 Running the Project Locally
 
-Example:
+1. Clone the repository or download the project folder.
 
-```php
-'GET' => [
-    '/contents' => fn() => (new ContentsController($pdo))->show(),
-]
+2. Open a terminal and navigate to the project root.
+
+3. Start the built-in PHP server:
+
+```bash
+php -S localhost:8000 -t public
 ```
 
-## Authentication & Authorization
+4. Open your browser and go to:
 
-* **AuthController.php** handles login, registration, logout.
-* User roles: `admin`, `contributor` (defined in the `users` table).
-* Admin-only features include user management and settings control.
-
-Session variables:
-
-```php
-$_SESSION['user_id']
-$_SESSION['username']
-$_SESSION['role']
+```
+http://localhost:8000
 ```
 
-Helper:
+---
 
-```php
-isAdmin(): bool
+## 📁 Project Structure
+
+```
+├── controllers/       # Handles user requests (e.g. login, dashboard, contents)
+├── models/            # Database abstraction for Units, Sections, Lessons, etc.
+├── includes/          # Initialization and helper functions
+├── views/             # HTML templates (split into partials and pages)
+├── public/            # Entry point (index.php) and static assets
+├── lib/               # Email logic and third-party libraries
+├── data/              # SQLite database file is stored here
 ```
 
-## Content Structure
+---
 
-The content hierarchy is:
+## 🎓 Features Overview
 
-* Unit → Section → Lesson
+### Public Pages
 
-Each has:
+* `/` — Landing page
+* `/contents` — Browse all Units, Sections, and Lessons
+* `/unit?id=...` — View a specific Unit and its Sections
+* `/section?id=...` — View a Section and its Lessons
+* `/lesson?id=...` — View a single Lesson (with next/previous nav)
 
-* `title`, `body`, `status`, `position`
-* Create/edit/delete interfaces (via modals)
-* Rich text powered by SunEditor
-* Reorderable via SortableJS
+### Authentication
 
-Controller/Model pairing:
+* `/register` — Sign up
+* `/login` — Log in
+* `/logout` — Log out
+* `/forgot-password` and `/reset-password` — Password recovery
 
-| Type    | Controller        | Model   |
-| ------- | ----------------- | ------- |
-| Unit    | UnitController    | Unit    |
-| Section | SectionController | Section |
-| Lesson  | LessonController  | Lesson  |
+### Dashboard (requires login)
 
-Each dashboard page follows this logic:
+* `/dashboard` — Overview for logged-in users
+* `/dashboard/unit-editor` — Add/edit/delete Units
+* `/dashboard/section-editor?unitId=...` — Manage Sections inside a Unit
+* `/dashboard/lesson-editor?unitId=...&sectionId=...` — Manage Lessons inside a Section
+* `/dashboard/manage-users` — Admin-only user management
+* `/dashboard/account` — Change your own password
 
-1. Fetch parent entity (unit/section)
-2. Display editable list
-3. Submit forms to POST routes to save/delete
+### Audio Uploads
 
-## Dashboard
+* Lessons and Sections use a WYSIWYG editor (SunEditor) that lets you upload audio directly. Audio is stored in the database as BLOBs. Images are converted to base64 and embedded in  the HTML in the database.
 
-* Route: `/dashboard`
-* Nav links to:
+---
 
-  * `/dashboard/unit-editor`
-  * `/dashboard/section-editor?unitId=...`
-  * `/dashboard/lesson-editor?unitId=...&sectionId=...`
-  * `/dashboard/manage-users` (admin only)
+## 🔑 Admin Tips
 
-The navbar breadcrumbs auto-adjust based on context.
+* The Users table is empty on initialization. The first registered user is automatically an administrator account. Every account registered after is registered as a contributor, but can be changed to an administrator role by another administrator.
+* Admins can create/edit/delete users, change passwords, change user roles, and toggle public registration.
+* User roles: `admin` and `contributor`
 
-## Audio Uploads
+---
 
-* Upload audio: `POST /audio/upload`
-* Stream audio: `GET /audio?id=...`
-* Stored in `audios` table as BLOBs (inline with `SunEditor`)
+## 🔧 Developer Notes
 
-## Admin Controls
+* Routing is handled manually in `public/index.php`
+* Session setup is in `includes/init.php`
+* The app uses `PHPMailer` (via `lib/sendmail.php`) for sending password reset emails
+* SQLite is used locally — database schema is automatically initialized in `init.php`
+* `views/partials/` contains reusable components like navbars and modals
 
-* Admin-only view at `/dashboard/manage-users`
-* User management: create, update, delete, reset password, change role
-* Settings management (e.g., toggle `registration_enabled`)
+---
 
-## Testing & Development Notes
+## 💡 Environment Variables
 
-* SQLite database is defined in `includes/init.php`
-* All schema creation is auto-executed on startup
-* Default registration is enabled; first registered user is `admin`
-* `SunEditor` and `SortableJS` are included via CDN + `/src/`
-* Bootstrap 5 and Bootstrap Icons are used for UI
+Create a `.env` file in the root with:
 
-## Adding New Features
-
-1. **Controller:** Create a new controller class in `controllers/`.
-2. **Model (optional):** Create or extend a model class in `models/`.
-3. **View:** Add or modify HTML templates in `views/`.
-4. **Route:** Register your route in `public/index.php`.
-5. **Permissions:** Use `isAdmin()` and `ensureAuthenticated()` to protect routes.
-6. **Data:** Use `$pdo` to run queries or extend a model class.
-
-## Helpful Functions
-
-From `includes/helpers.php`:
-
-```php
-isAdmin(): bool
-getSetting(PDO $pdo, string $key, string $default): string
-setSetting(PDO $pdo, string $key, string $value): void
-getAllSettings(PDO $pdo): array
+```
+SMTP_USERNAME=your@email.com
+SMTP_PASSWORD=your_smtp_app_password
 ```
 
-## Contributing
+## 🚀 XML Import Script
 
-When working on a feature:
+There is a Python script in the root directory that imports and transforms content from the legacy master.xml file into the new SQLite database format. It:
 
-* Keep code modular (follow MVC separation)
-* Escape user inputs in views using `htmlspecialchars`
-* Use prepared statements for all DB interactions
-* Follow existing UI conventions and styling
+- Parses the XML structure (sections > units > lessons)
+- Converts `<note>` elements to HTML paragraphs
+- Converts `<dialog>` and `<vocab>` blocks to HTML tables with embedded audio players
+- Converts `<activity>` blocks to interactive HTML tables
+- Inserts audio files as binary blobs in the audios table
+- Reports any missing audio files
+- Inserts the final structured content into units, sections, and lessons tables
 
-## Questions?
+To use it, run:
 
-Talk to the maintainer or check the relevant controller/view.
+```sh
+python migration.py
+```
 
-Happy coding! 🎉
+Make sure your `master.xml` and `audio/` folder are both present.
+
+---
+
+## 🙌 Need Help?
+
+If you run into issues:
+
+* Check your PHP error logs
+* Make sure the `data/` folder is writable (for SQLite)
+* Ensure your SMTP credentials are valid. Also, ensure that there are no spaces in the app password.
