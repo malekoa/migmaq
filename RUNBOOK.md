@@ -52,15 +52,11 @@ git clone https://github.com/malekoa/migmaq.git
 ### 2. Install and Configure Caddy
 
 ```bash
-sudo apt update
 sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
-curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | \
-  sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
-curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | \
-  sed 's/^deb /deb [signed-by=\/usr\/share\/keyrings\/caddy-stable-archive-keyring.gpg] /' | \
-  sudo tee /etc/apt/sources.list.d/caddy-stable.list
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
 sudo apt update
-sudo apt install caddy
+sudo apt install -y caddy
 ```
 
 ### 3. Configure Caddy
@@ -136,6 +132,7 @@ sudo systemctl restart caddy
 ### 4. Open Firewall Ports
 
 ```bash
+sudo ufw allow ssh
 sudo ufw allow 80,443/tcp
 sudo ufw allow out to any port 587
 sudo ufw enable
@@ -144,37 +141,12 @@ sudo ufw enable
 ### 5. Install PHP and Required Modules
 
 ```bash
-sudo apt install php8.3 php8.3-fpm php8.3-sqlite3
+sudo apt install -y php8.3 php8.3-fpm php8.3-mbstring php8.3-sqlite3 php8.3-curl php8.3-xml php8.3-cli unzip
 ```
 
-### 6. Configure PHP
+### 6. Set Ownership and Permissions
 
-Edit pool configuration (in most cases, this doesn't require changes, but you can confirm settings like `user`, `group`, or `listen`):
-
-```bash
-sudo vim /etc/php/8.3/fpm/pool.d/www.conf
-```
-
-Edit `php.ini` **only if you want to enable debugging features** like displaying errors directly in the browser. This can help when debugging issues such as incorrect permissions:
-
-```bash
-sudo vim /etc/php/8.3/fpm/php.ini
-```
-
-Look for and enable the following lines:
-
-```ini
-display_errors = On
-display_startup_errors = On
-```
-
-Then restart PHP:
-
-```bash
-sudo systemctl restart php8.3-fpm
-```
-
-### 7. Set Ownership and Permissions
+Ensure you have a `data.db` file located in the project's `data` directory. This can be an empty sqlite db file which can be created using `touch data.db` or download a pre-built database.
 
 ```bash
 sudo chown -R www-data:www-data /var/www/migmaq/
@@ -182,15 +154,7 @@ sudo chmod -R 755 /var/www/migmaq/
 sudo chmod 664 /var/www/migmaq/data/data.db
 ```
 
-### 8. Replace Apache with Caddy (if necessary)
-
-```bash
-sudo systemctl stop apache2
-sudo systemctl disable apache2
-sudo systemctl start caddy
-```
-
-### 9. Prepare the Included Database
+### 7. Prepare the Included Database
 
 The repository now includes the SQLite database file (`data.db`), so there's no need to download it separately. You just need to make sure the file has the correct permissions:
 
@@ -200,7 +164,7 @@ sudo chmod 664 data.db
 sudo chown www-data:www-data data.db
 ```
 
-### 10. Create Environment File
+### 8. Create Environment File
 
 Your `.env` file should contain environment variables such as SMTP credentials for sending mail. For example:
 
@@ -223,18 +187,21 @@ Then create the `.env` file:
 
 ```bash
 cd /var/www/migmaq/
-touch .env
 vim .env
 ```
 
-### 11. Restart Services
+### 9. Restart Services
 
 ```bash
 sudo systemctl restart php8.3-fpm
 sudo systemctl restart caddy
 ```
 
-### 12. Test Email Sending (Optional)
+### Test Website
+
+At this point, the website should be reachable at your droplet's public IP address or at the domain name you specified in your `Caddyfile`.
+
+### Test Email Sending (Optional)
 
 DigitalOcean droplets have outbound port 587 (used for sending email) blocked by default. You must open a support ticket asking DigitalOcean to unblock this port. The request typically takes around **24 hours** to process.
 
