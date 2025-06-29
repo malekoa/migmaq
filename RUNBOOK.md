@@ -1,8 +1,34 @@
 ## Setting Up the Learn Mi'gmaq Website on a DigitalOcean Droplet (Using Caddy and PHP 8.3)
 
-> ⚠️ **Note:** There is an interactive script called `interactive-setup.sh` that automates much of this setup. It's useful for quickly bootstrapping the server, especially if you're repeating this process or want to avoid manual configuration.
+This guide summarizes the process of setting up the Learn Mi'gmaq website on a DigitalOcean droplet. Follow these steps in order:
 
-This guide summarizes the sequence of shell commands used to set up the Learn Mi'gmaq website on a DigitalOcean droplet. Follow these steps in order:
+### ⚠️ Quick Start
+
+This project includes an interactive script, `interactive-setup.sh`, which automates the setup process. It’s ideal for bootstrapping a fresh droplet quickly, especially if you're repeating the setup or want to avoid manual configuration.
+
+To use it:
+
+- Clone the repository into `/var/www` on a clean DigitalOcean droplet.
+
+```sh
+git clone https://github.com/malekoa/migmaq.git
+```
+
+- Change directories into the project directory
+
+```sh
+cd migmaq
+```
+
+- Run the `interactive-setup.sh` script.
+
+```sh
+sudo bash interactive-setup.sh
+```
+
+- Follow setup instructions.
+
+> 🚨 **Database URL**: When prompted, provide a direct download link to a prebuilt SQLite database file named `data.db`. You can upload this file to google drive and then use [this tool](https://sites.google.com/site/gdocs2direct/) to generate a direct download link.
 
 ---
 

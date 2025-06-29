@@ -7,6 +7,7 @@ CADDYFILE="/etc/caddy/Caddyfile"
 ENV_FILE="$PROJECT_DIR/.env"
 DATA_DIR="$PROJECT_DIR/data"
 DB_FILE="$DATA_DIR/data.db"
+PUBLIC_IP=$(curl -s https://ipinfo.io/ip)
 
 echo "🌐 Welcome to the Learn Mi'gmaq Setup Script!"
 echo "============================================="
@@ -17,6 +18,9 @@ read -p "Do you have a domain name to use with this site? (y/N): " use_domain
 
 if [[ "$use_domain" =~ ^[Yy]$ ]]; then
   read -p "Enter your domain name (e.g., learnmigmaq.example.com): " domain
+  echo "⚠️  Remember to create an A record pointing to your droplet's IP address!"
+  echo "Your droplet's IP address is: $PUBLIC_IP"
+  read -p "Press Enter to continue..."
 else
   domain=":80"
   echo "⚠️  Proceeding with local setup (no HTTPS, no domain)"
@@ -115,9 +119,6 @@ else
 fi
 
 sudo systemctl restart caddy
-
-# Get public IP
-PUBLIC_IP=$(curl -s https://ipinfo.io/ip)
 
 echo
 echo "✅ Setup complete!"
