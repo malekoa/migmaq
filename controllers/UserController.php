@@ -1,12 +1,16 @@
 <?php
 
+require_once __DIR__ . '/../models/User.php';
+
 class UserController
 {
     private PDO $pdo;
+    private User $userModel;
 
     public function __construct(PDO $pdo)
     {
         $this->pdo = $pdo;
+        $this->userModel = new User($pdo);
     }
 
     public function index(): void
@@ -16,8 +20,7 @@ class UserController
             exit("Access denied");
         }
 
-        $stmt = $this->pdo->query("SELECT id, username, email, role FROM users ORDER BY id ASC");
-        $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $users = $this->userModel->all();
         $pdo = $this->pdo;
         $allSettings = getAllSettings($this->pdo);
 
@@ -59,15 +62,20 @@ class UserController
         $userId = $_POST['userId'] ?? null;
         $role = $_POST['role'] ?? null;
 
-        if ($userId && in_array($role, ['admin', 'contributor'])) {
-            $stmt = $this->pdo->prepare("UPDATE users SET role = ? WHERE id = ?");
-            $stmt->execute([$role, $userId]);
+        if (!ctype_digit($userId) || !in_array($role, ['admin', 'contributor'], true)) {
+            http_response_code(400);
+            exit("Invalid input");
+        }
+
+        $user = $this->userModel->find((int)$userId);
+        if ($user) {
+            $this->userModel->update((int)$userId, $user['username'], $user['email'], $role);
             header("Location: /dashboard/manage-users?status=role_updated");
             exit;
         }
 
-        http_response_code(400);
-        exit("Invalid input");
+        http_response_code(404);
+        exit("User not found");
     }
 
     public function changePassword(): void
@@ -82,16 +90,14 @@ class UserController
         $userId = $_POST['userId'] ?? null;
         $password = $_POST['password'] ?? null;
 
-        if ($userId && $password && strlen($password) >= 6) {
-            $hashed = password_hash($password, PASSWORD_DEFAULT);
-            $stmt = $this->pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
-            $stmt->execute([$hashed, $userId]);
-            header("Location: /dashboard/manage-users?status=password_changed");
-            exit;
+        if (!ctype_digit($userId) || !$password || strlen($password) < 6) {
+            http_response_code(400);
+            exit("Invalid input");
         }
 
-        http_response_code(400);
-        exit("Invalid input");
+        $this->userModel->updatePassword((int)$userId, $password);
+        header("Location: /dashboard/manage-users?status=password_changed");
+        exit();
     }
 
     public function createUser(): void
@@ -113,9 +119,7 @@ class UserController
             exit("Invalid input");
         }
 
-        $hashed = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $this->pdo->prepare("INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$username, $email, $hashed, $role]);
+        $this->userModel->create($username, $email, $password, $role);
 
         header("Location: /dashboard/manage-users?status=user_created");
         exit;
@@ -135,15 +139,14 @@ class UserController
         $email = trim($_POST['email'] ?? '');
         $role = $_POST['role'] ?? null;
 
-        if ($id && $username && $email && in_array($role, ['admin', 'contributor'])) {
-            $stmt = $this->pdo->prepare("UPDATE users SET username = ?, email = ?, role = ? WHERE id = ?");
-            $stmt->execute([$username, $email, $role, $id]);
-            header("Location: /dashboard/manage-users?status=updated");
-            exit;
+        if (!ctype_digit($id) || !$username || !$email || !in_array($role, ['admin', 'contributor'], true)) {
+            http_response_code(400);
+            exit("Invalid input");
         }
 
-        http_response_code(400);
-        exit("Invalid input");
+        $this->userModel->update((int)$id, $username, $email, $role);
+        header("Location: /dashboard/manage-users?status=updated");
+        exit();
     }
 
     public function deleteUser(): void
@@ -156,15 +159,15 @@ class UserController
         }
 
         $id = $_POST['userId'] ?? null;
-        if ($id) {
-            $stmt = $this->pdo->prepare("DELETE FROM users WHERE id = ?");
-            $stmt->execute([$id]);
-            header("Location: /dashboard/manage-users?status=deleted");
-            exit;
+
+        if (!ctype_digit($id)) {
+            http_response_code(400);
+            exit("Missing or invalid ID");
         }
 
-        http_response_code(400);
-        exit("Missing ID");
+        $this->userModel->delete((int)$id);
+        header("Location: /dashboard/manage-users?status=deleted");
+        exit();
     }
 
     public function toggleRegistration(): void
@@ -190,9 +193,7 @@ class UserController
         }
 
         $userId = $_SESSION['user_id'];
-        $stmt = $this->pdo->prepare("SELECT username, email FROM users WHERE id = ?");
-        $stmt->execute([$userId]);
-        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $user = $this->userModel->find((int)$userId);
 
         if (!$user) {
             http_response_code(404);
@@ -230,11 +231,7 @@ class UserController
             $errors[] = "Password must be at least 6 characters.";
         }
 
-        $stmt = $this->pdo->prepare("SELECT password FROM users WHERE id = ?");
-        $stmt->execute([$userId]);
-        $hash = $stmt->fetchColumn();
-
-        if (!$hash || !password_verify($currentPassword, $hash)) {
+        if (!$this->userModel->verifyPassword((int)$userId, $currentPassword)) {
             $errors[] = "Current password is incorrect.";
         }
 
@@ -244,9 +241,7 @@ class UserController
             exit;
         }
 
-        $newHash = password_hash($newPassword, PASSWORD_DEFAULT);
-        $stmt = $this->pdo->prepare("UPDATE users SET password = ? WHERE id = ?");
-        $stmt->execute([$newHash, $userId]);
+        $this->userModel->updatePassword((int)$userId, $newPassword);
 
         $_SESSION['account_success'] = true;
         header("Location: /dashboard/account");
